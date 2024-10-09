@@ -33,7 +33,7 @@ export const SignUp = ({ setType }: Props) => {
 
     setIsLoading(true);
 
-    signIn("password", { email, password, flow: "signUp" })
+    signIn("password", { name, email, password, flow: "signUp" })
       .catch(() => setError("Something went wrong."))
       .finally(() => setIsLoading(false));
   };
