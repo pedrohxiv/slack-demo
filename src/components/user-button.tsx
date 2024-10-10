@@ -3,6 +3,7 @@
 import { useAuthActions } from "@convex-dev/auth/react";
 import { LogOut } from "lucide-react";
 
+import { getCurrentUser } from "@/actions/users";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
   DropdownMenu,
@@ -11,11 +12,10 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Skeleton } from "@/components/ui/skeleton";
-import { useCurrentUser } from "@/hooks/users";
 
 export const UserButton = () => {
+  const { data, isLoading } = getCurrentUser();
   const { signOut } = useAuthActions();
-  const { data, isLoading } = useCurrentUser();
 
   if (isLoading) {
     return <Skeleton className="size-10 rounded-full" />;

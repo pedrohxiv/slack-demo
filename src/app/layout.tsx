@@ -1,7 +1,9 @@
 import { ConvexAuthNextjsServerProvider } from "@convex-dev/auth/nextjs/server";
 import type { Metadata } from "next";
 
+import { Modals } from "@/components/modals";
 import { ConvexClientProvider } from "@/components/providers/convex";
+import { Toaster } from "@/components/ui/toaster";
 import "@/styles/global.css";
 
 export const metadata: Metadata = {
@@ -17,7 +19,11 @@ const RootLayout = ({ children }: Props) => {
     <ConvexAuthNextjsServerProvider>
       <html>
         <body>
-          <ConvexClientProvider>{children}</ConvexClientProvider>
+          <ConvexClientProvider>
+            {children}
+            <Toaster />
+            <Modals />
+          </ConvexClientProvider>
         </body>
       </html>
     </ConvexAuthNextjsServerProvider>
