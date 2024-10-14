@@ -10,9 +10,9 @@ import { useCreateWorkspace } from "@/store/create-workspace";
 const RootPage = () => {
   const [open, setOpen] = useCreateWorkspace();
 
-  const { data, isLoading } = getWorkspaces();
-
   const router = useRouter();
+
+  const { data, isLoading } = getWorkspaces();
 
   const workspaceId = useMemo(() => data?.[0]?._id, [data]);
 

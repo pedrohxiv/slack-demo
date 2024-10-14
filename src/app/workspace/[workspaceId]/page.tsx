@@ -1,8 +1,4 @@
-interface Props {
-  params: { workspaceId: string };
-}
-
-const WorkspacePage = ({}: Props) => {
+const WorkspacePage = () => {
   return null;
 };
 

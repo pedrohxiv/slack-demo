@@ -17,10 +17,10 @@ export const CreateWorkspace = () => {
   const [name, setName] = useState("");
   const [open, setOpen] = useCreateWorkspace();
 
+  const router = useRouter();
+
   const { mutate, isPending } = createWorkspace();
   const { toast } = useToast();
-
-  const router = useRouter();
 
   const handleClose = () => {
     setOpen(false);
