@@ -3,6 +3,7 @@ import type { Metadata } from "next";
 
 import { Modals } from "@/components/modals";
 import { ConvexClientProvider } from "@/components/providers/convex";
+import { JotaiProvider } from "@/components/providers/jotai";
 import { Toaster } from "@/components/ui/toaster";
 import "@/styles/global.css";
 
@@ -20,9 +21,11 @@ const RootLayout = ({ children }: Props) => {
       <html>
         <body>
           <ConvexClientProvider>
-            {children}
-            <Toaster />
-            <Modals />
+            <JotaiProvider>
+              {children}
+              <Toaster />
+              <Modals />
+            </JotaiProvider>
           </ConvexClientProvider>
         </body>
       </html>

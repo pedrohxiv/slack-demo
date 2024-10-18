@@ -4,7 +4,6 @@ import { useRouter } from "next/navigation";
 import { useEffect, useMemo } from "react";
 
 import { getWorkspaces } from "@/actions/workspaces";
-import { UserButton } from "@/components/user-button";
 import { useCreateWorkspace } from "@/store/create-workspace";
 
 const RootPage = () => {
@@ -28,7 +27,7 @@ const RootPage = () => {
     }
   }, [open, setOpen, isLoading, router, workspaceId]);
 
-  return <UserButton />;
+  return null;
 };
 
 export default RootPage;

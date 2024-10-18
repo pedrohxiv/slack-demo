@@ -33,12 +33,12 @@ export const CreateWorkspace = () => {
     mutate(
       { name },
       {
-        onSuccess(id) {
+        onSuccess: (id) => {
           router.push(`/workspace/${id}`);
 
           handleClose();
         },
-        onError(error) {
+        onError: (error) => {
           console.error(error);
 
           toast({

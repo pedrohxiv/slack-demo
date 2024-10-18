@@ -6,7 +6,7 @@ export const current = query({
   handler: async (ctx) => {
     const userId = await getAuthUserId(ctx);
 
-    if (userId === null) {
+    if (!userId) {
       return null;
     }
 

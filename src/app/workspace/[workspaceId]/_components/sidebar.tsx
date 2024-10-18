@@ -34,14 +34,14 @@ export const Sidebar = () => {
   return (
     <aside className="w-[70px] h-full bg-[#481349] flex flex-col gap-y-4 items-center pt-[9px] pb-4">
       <DropdownMenu>
-        <DropdownMenuTrigger>
-          <Button className="size-9 relative overflow-hidden bg-[#ABABAD] hover:bg-[#ABABAD]/80 text-slate-800 font-semibold text-xl">
-            {workspaceIsLoading ? (
-              <Skeleton />
-            ) : (
-              workspaceData?.name.charAt(0).toUpperCase()
-            )}
-          </Button>
+        <DropdownMenuTrigger asChild>
+          {workspaceIsLoading ? (
+            <Skeleton className="size-9" />
+          ) : (
+            <Button className="size-9 relative overflow-hidden bg-[#ABABAD] hover:bg-[#ABABAD]/80 text-slate-800 font-semibold text-xl">
+              {workspaceData?.name.charAt(0).toUpperCase()}
+            </Button>
+          )}
         </DropdownMenuTrigger>
         <DropdownMenuContent align="start" className="w-64" side="bottom">
           <DropdownMenuItem
