@@ -18,7 +18,7 @@ export const UserButton = () => {
   const { signOut } = useAuthActions();
 
   if (isLoading) {
-    return <Skeleton className="size-10 rounded-full" />;
+    return <Skeleton className="size-10 rounded-md" />;
   }
 
   if (!data || !data.image || !data.name) {
@@ -28,9 +28,13 @@ export const UserButton = () => {
   return (
     <DropdownMenu modal={false}>
       <DropdownMenuTrigger className="outline-none relative">
-        <Avatar className="size-10 hover:opacity-75 transition">
-          <AvatarImage alt={data.name} src={data.image} />
-          <AvatarFallback className="bg-sky-500 text-white">
+        <Avatar className="rounded-md size-10 hover:opacity-75 transition">
+          <AvatarImage
+            alt={data.name}
+            className="rounded-md"
+            src={data.image}
+          />
+          <AvatarFallback className="rounded-md bg-sky-500 text-white">
             {data.name.charAt(0).toUpperCase()}
           </AvatarFallback>
         </Avatar>
