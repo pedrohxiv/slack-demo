@@ -28,11 +28,13 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Skeleton } from "@/components/ui/skeleton";
 import { cn } from "@/lib/utils";
+import { useCreateChannel } from "@/store/create-channel";
 
 export const InternalSidebar = () => {
   const [preferencesOpen, setPreferencesOpen] = useState<boolean>(false);
   const [channelsOpen, setChannelsOpen] = useState<boolean>(true);
   const [messagesOpen, setMessagesOpen] = useState<boolean>(true);
+  const [_, setCreateChannelOpen] = useCreateChannel();
 
   const params = useParams<{ workspaceId: string }>();
 
@@ -209,16 +211,18 @@ export const InternalSidebar = () => {
           >
             <span className="truncate">Channels</span>
           </Button>
-          <Hint label="New channel" side="top" align="center">
-            <Button
-              onClick={() => {}}
-              variant="transparent"
-              size="icon"
-              className="opacity-0 group-hover:opacity-100 transition-opacity ml-auto p-0.5 text-sm text-[#F9EDFFCC] size-6 shrink-0"
-            >
-              <Plus className="size-5" />
-            </Button>
-          </Hint>
+          {memberData.role === "admin" && (
+            <Hint label="New channel" side="top" align="center">
+              <Button
+                onClick={() => setCreateChannelOpen(true)}
+                variant="transparent"
+                size="icon"
+                className="opacity-0 group-hover:opacity-100 transition-opacity ml-auto p-0.5 text-sm text-[#F9EDFFCC] size-6 shrink-0"
+              >
+                <Plus className="size-5" />
+              </Button>
+            </Hint>
+          )}
         </div>
         {channelsOpen &&
           channelsData?.map((item) => (
@@ -262,16 +266,18 @@ export const InternalSidebar = () => {
           >
             <span className="truncate">Direct Messages</span>
           </Button>
-          <Hint label="New direct message" side="top" align="center">
-            <Button
-              onClick={() => {}}
-              variant="transparent"
-              size="icon"
-              className="opacity-0 group-hover:opacity-100 transition-opacity ml-auto p-0.5 text-sm text-[#F9EDFFCC] size-6 shrink-0"
-            >
-              <Plus className="size-5" />
-            </Button>
-          </Hint>
+          {memberData.role === "admin" && (
+            <Hint label="New direct message" side="top" align="center">
+              <Button
+                onClick={() => {}}
+                variant="transparent"
+                size="icon"
+                className="opacity-0 group-hover:opacity-100 transition-opacity ml-auto p-0.5 text-sm text-[#F9EDFFCC] size-6 shrink-0"
+              >
+                <Plus className="size-5" />
+              </Button>
+            </Hint>
+          )}
         </div>
         {messagesOpen &&
           membersData?.map((item) => (

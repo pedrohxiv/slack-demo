@@ -1,7 +1,7 @@
-import { useRouter } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import { useState } from "react";
 
-import { createWorkspace } from "@/actions/workspaces";
+import { createChannel } from "@/actions/channels";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -11,15 +11,16 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
-import { useCreateWorkspace } from "@/store/create-workspace";
+import { useCreateChannel } from "@/store/create-channel";
 
-export const CreateWorkspace = () => {
+export const CreateChannel = () => {
   const [name, setName] = useState<string>("");
-  const [open, setOpen] = useCreateWorkspace();
+  const [open, setOpen] = useCreateChannel();
 
+  const params = useParams<{ workspaceId: string }>();
   const router = useRouter();
 
-  const { mutate, isPending } = createWorkspace();
+  const { mutate, isPending } = createChannel();
   const { toast } = useToast();
 
   const handleClose = () => {
@@ -31,10 +32,10 @@ export const CreateWorkspace = () => {
     e.preventDefault();
 
     mutate(
-      { name },
+      { name, workspaceId: params.workspaceId },
       {
         onSuccess: (id) => {
-          router.push(`/workspace/${id}`);
+          router.push(`/workspace/${params.workspaceId}/channel/${id}`);
 
           handleClose();
         },
@@ -55,14 +56,16 @@ export const CreateWorkspace = () => {
     <Dialog open={open} onOpenChange={handleClose}>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Add a Workspace</DialogTitle>
+          <DialogTitle>Add a Channel</DialogTitle>
         </DialogHeader>
         <form className="space-y-4" onSubmit={handleSubmit}>
           <Input
             autoFocus
             disabled={isPending}
             minLength={3}
-            onChange={(e) => setName(e.target.value)}
+            onChange={(e) =>
+              setName(e.target.value.replace(/\s+/g, "-").toLowerCase())
+            }
             placeholder="Name"
             required
             value={name}

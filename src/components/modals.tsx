@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 
+import { CreateChannel } from "@/components/modals/create-channel";
 import { CreateWorkspace } from "@/components/modals/create-workspace";
 
 export const Modals = () => {
@@ -17,6 +18,7 @@ export const Modals = () => {
 
   return (
     <>
+      <CreateChannel />
       <CreateWorkspace />
     </>
   );
