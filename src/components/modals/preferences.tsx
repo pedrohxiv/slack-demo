@@ -3,7 +3,12 @@ import { useParams, useRouter } from "next/navigation";
 import { useState } from "react";
 
 import { removeWorkspace, updateWorkspace } from "@/actions/workspaces";
-import { Dialog, DialogContent, DialogHeader } from "@/components/ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
@@ -77,7 +82,7 @@ export const Preferences = ({ initialValue, open, setOpen }: Props) => {
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogContent className="p-0 bg-gray-50 overflow-hidden">
         <DialogHeader className="p-4 border-b bg-white">
-          {initialValue}
+          <DialogTitle>{initialValue}</DialogTitle>
         </DialogHeader>
         <div className="px-4 pb-4 flex flex-col gap-y-2">
           {!isEditing ? (

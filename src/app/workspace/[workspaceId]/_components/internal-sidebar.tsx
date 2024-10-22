@@ -16,6 +16,7 @@ import { getChannels } from "@/actions/channels";
 import { getCurrentMember, getMembers } from "@/actions/members";
 import { getWorkspace } from "@/actions/workspaces";
 import { Hint } from "@/components/hint";
+import { Invite } from "@/components/modals/invite";
 import { Preferences } from "@/components/modals/preferences";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
@@ -31,6 +32,7 @@ import { cn } from "@/lib/utils";
 import { useCreateChannel } from "@/store/create-channel";
 
 export const InternalSidebar = () => {
+  const [inviteOpen, setInviteOpen] = useState<boolean>(false);
   const [preferencesOpen, setPreferencesOpen] = useState<boolean>(false);
   const [channelsOpen, setChannelsOpen] = useState<boolean>(true);
   const [messagesOpen, setMessagesOpen] = useState<boolean>(true);
@@ -105,6 +107,12 @@ export const InternalSidebar = () => {
 
   return (
     <div className="flex flex-col bg-[#5E2C5F] h-full">
+      <Invite
+        name={workspaceData.name}
+        joinCode={workspaceData.joinCode}
+        open={inviteOpen}
+        setOpen={setInviteOpen}
+      />
       <Preferences
         initialValue={workspaceData.name}
         open={preferencesOpen}
@@ -139,7 +147,7 @@ export const InternalSidebar = () => {
                 <DropdownMenuSeparator />
                 <DropdownMenuItem
                   className="cursor-pointer py-2"
-                  onClick={() => {}}
+                  onClick={() => setInviteOpen(true)}
                 >
                   Invite people to {workspaceData.name}
                 </DropdownMenuItem>
