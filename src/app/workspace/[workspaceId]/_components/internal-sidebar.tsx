@@ -38,7 +38,7 @@ export const InternalSidebar = () => {
   const [messagesOpen, setMessagesOpen] = useState<boolean>(true);
   const [_, setCreateChannelOpen] = useCreateChannel();
 
-  const params = useParams<{ workspaceId: string }>();
+  const params = useParams<{ workspaceId: string; channelId: string }>();
 
   const { data: memberData, isLoading: memberIsLoading } = getCurrentMember({
     workspaceId: params.workspaceId,
@@ -239,7 +239,8 @@ export const InternalSidebar = () => {
               className={cn(
                 "flex items-center gap-1.5 justify-start font-normal h-7 px-[18px] text-sm overflow-hidden text-[#F9EDFFCC]",
                 {
-                  "text-[#481349] bg-white/90 hover:bg-white/90": false,
+                  "text-[#481349] bg-white/90 hover:bg-white/90":
+                    params.channelId === item._id,
                 }
               )}
               size="sm"
