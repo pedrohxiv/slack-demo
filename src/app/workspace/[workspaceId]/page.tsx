@@ -58,7 +58,7 @@ const WorkspacePage = () => {
     params.workspaceId,
   ]);
 
-  if (workspaceIsLoading || channelsIsLoading) {
+  if (memberIsLoading || workspaceIsLoading || channelsIsLoading) {
     return (
       <div className="h-full flex-1 flex items-center justify-center flex-col gap-2">
         <Loader2 className="size-6 animate-spin text-muted-foreground" />
@@ -66,7 +66,7 @@ const WorkspacePage = () => {
     );
   }
 
-  if (!workspaceData) {
+  if (!memberData || !workspaceData) {
     return (
       <div className="h-full flex-1 flex items-center justify-center flex-col gap-2">
         <TriangleAlert className="size-6 text-muted-foreground" />

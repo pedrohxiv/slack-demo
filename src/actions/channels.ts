@@ -67,3 +67,106 @@ export const getChannels = ({ workspaceId }: { workspaceId: string }) => {
 
   return { data, isLoading };
 };
+
+export const getChannel = ({ id }: { id: string }) => {
+  const data = useQuery(api.channels.getById, { id });
+
+  const isLoading = data === undefined;
+
+  return { data, isLoading };
+};
+
+export const updateChannel = () => {
+  const [data, setData] = useState<Id<"channels"> | null>(null);
+  const [error, setError] = useState<Error | null>(null);
+  const [status, setStatus] = useState<
+    "success" | "error" | "settled" | "pending" | null
+  >(null);
+
+  const isPending = useMemo(() => status === "pending", [status]);
+  const isSuccess = useMemo(() => status === "success", [status]);
+  const isError = useMemo(() => status === "error", [status]);
+  const isSettled = useMemo(() => status === "settled", [status]);
+
+  const mutation = useMutation(api.channels.update);
+
+  const mutate = useCallback(
+    async (
+      values: { id: string; workspaceId: string; name: string },
+      options?: Options
+    ) => {
+      try {
+        setData(null);
+        setError(null);
+        setStatus("pending");
+
+        const response = await mutation(values);
+
+        options?.onSuccess?.(response);
+
+        return response;
+      } catch (error) {
+        setStatus("error");
+
+        options?.onError?.(error as Error);
+
+        if (options?.throwError) {
+          throw error;
+        }
+      } finally {
+        setStatus("settled");
+
+        options?.onSettled?.();
+      }
+    },
+    [mutation]
+  );
+
+  return { mutate, data, error, isPending, isSuccess, isError, isSettled };
+};
+
+export const removeChannel = () => {
+  const [data, setData] = useState<Id<"channels"> | null>(null);
+  const [error, setError] = useState<Error | null>(null);
+  const [status, setStatus] = useState<
+    "success" | "error" | "settled" | "pending" | null
+  >(null);
+
+  const isPending = useMemo(() => status === "pending", [status]);
+  const isSuccess = useMemo(() => status === "success", [status]);
+  const isError = useMemo(() => status === "error", [status]);
+  const isSettled = useMemo(() => status === "settled", [status]);
+
+  const mutation = useMutation(api.channels.remove);
+
+  const mutate = useCallback(
+    async (values: { id: string; workspaceId: string }, options?: Options) => {
+      try {
+        setData(null);
+        setError(null);
+        setStatus("pending");
+
+        const response = await mutation(values);
+
+        options?.onSuccess?.(response);
+
+        return response;
+      } catch (error) {
+        setStatus("error");
+
+        options?.onError?.(error as Error);
+
+        if (options?.throwError) {
+          throw error;
+        }
+      } finally {
+        setStatus("settled");
+
+        options?.onSettled?.();
+      }
+    },
+    [mutation]
+  );
+
+  return { mutate, data, error, isPending, isSuccess, isError, isSettled };
+};
