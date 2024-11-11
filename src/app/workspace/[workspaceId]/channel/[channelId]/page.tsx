@@ -5,6 +5,7 @@ import { useParams } from "next/navigation";
 
 import { getChannel } from "@/actions/channels";
 
+import { ChatInput } from "./_components/chat-input";
 import { Header } from "./_components/header";
 
 const ChannelPage = () => {
@@ -30,6 +31,8 @@ const ChannelPage = () => {
   return (
     <div className="flex flex-col h-full">
       <Header title={data.name} />
+      <div className="flex-1" />
+      <ChatInput placeholder={`Message # ${data.name}`} />
     </div>
   );
 };
