@@ -17,7 +17,6 @@ export const ChatInput = ({ placeholder }: Props) => {
         disabled={false}
         innerRef={editorRef}
         placeholder={placeholder}
-        variant="update"
       />
     </div>
   );

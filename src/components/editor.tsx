@@ -1,7 +1,6 @@
 import { ALargeSmall, ImageIcon, SendHorizonal, Smile } from "lucide-react";
 import Quill, { type QuillOptions } from "quill";
 import type { Delta, Op } from "quill/core";
-import "quill/dist/quill.snow.css";
 import {
   type MutableRefObject,
   useEffect,
@@ -10,6 +9,9 @@ import {
   useState,
 } from "react";
 
+import "quill/dist/quill.snow.css";
+
+import { EmojiPopover } from "@/components/emoji-popover";
 import { Hint } from "@/components/hint";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -51,6 +53,12 @@ export const Editor = ({
     if (toolbarElement) {
       toolbarElement.classList.toggle("hidden");
     }
+  };
+
+  const onEmojiSelect = (emoji: any) => {
+    const quill = quillRef.current;
+
+    quill?.insertText(quill.getSelection()?.index || 0, emoji.native);
   };
 
   useLayoutEffect(() => {
@@ -153,16 +161,11 @@ export const Editor = ({
               <ALargeSmall className="size-4" />
             </Button>
           </Hint>
-          <Hint label="Emoji">
-            <Button
-              disabled={disabled}
-              onClick={() => {}}
-              size="sm"
-              variant="ghost"
-            >
+          <EmojiPopover onEmojiSelect={onEmojiSelect}>
+            <Button disabled={disabled} size="sm" variant="ghost">
               <Smile className="size-4" />
             </Button>
-          </Hint>
+          </EmojiPopover>
           {variant === "create" && (
             <Hint label="Image">
               <Button
@@ -213,9 +216,18 @@ export const Editor = ({
           )}
         </div>
       </div>
-      <p className="p-2 text-[10px] text-muted-foreground flex justify-end">
-        <strong className="">Shift + Return</strong> to add a new line
-      </p>
+      {variant === "create" && (
+        <p
+          className={cn(
+            "p-2 text-[10px] text-muted-foreground flex justify-end opacity-0 transition",
+            {
+              "opacity-100": !isEmpty,
+            }
+          )}
+        >
+          <strong className="mr-1">Shift + Return</strong>to add a new line
+        </p>
+      )}
     </div>
   );
 };
