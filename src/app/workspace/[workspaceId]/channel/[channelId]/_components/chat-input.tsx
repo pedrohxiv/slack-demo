@@ -3,6 +3,7 @@ import Quill from "quill";
 import { useRef, useState } from "react";
 
 import { createMessage } from "@/actions/messages";
+import { generateUploadUrl } from "@/actions/upload";
 import { Editor } from "@/components/editor";
 import { useToast } from "@/hooks/use-toast";
 
@@ -11,41 +12,79 @@ interface Props {
 }
 
 export const ChatInput = ({ placeholder }: Props) => {
+  const [isPending, setIsPending] = useState<boolean>(false);
   const [editorKey, setEditorKey] = useState<number>(0);
 
   const params = useParams<{ workspaceId: string; channelId: string }>();
   const editorRef = useRef<Quill | null>(null);
 
-  const { mutate, isPending } = createMessage();
+  const { mutate: generateUploadUrlMutate } = generateUploadUrl();
+  const { mutate: createMessageMutate } = createMessage();
   const { toast } = useToast();
 
-  const handleSubmit = ({
+  const handleSubmit = async ({
     body,
     image,
   }: {
     body: string;
     image: File | null;
   }) => {
-    mutate(
-      {
+    try {
+      setIsPending(true);
+
+      editorRef.current?.enable(false);
+
+      const values: {
+        body: string;
+        image?: string;
+        workspaceId: string;
+        channelId?: string;
+        parentMessageId?: string;
+      } = {
         body,
+        image: undefined,
         workspaceId: params.workspaceId,
         channelId: params.channelId,
-      },
-      {
-        onError: (error) => {
-          console.error(error);
+      };
 
-          toast({
-            variant: "destructive",
-            title: "Uh oh! Something went wrong.",
-            description: "There was a problem with your request.",
-          });
-        },
+      if (image) {
+        const url = await generateUploadUrlMutate({ throwError: true });
+
+        if (!url) {
+          throw new Error("Url not found");
+        }
+
+        const result = await fetch(url, {
+          method: "POST",
+          headers: { "Content-Type": image.type },
+          body: image,
+        });
+
+        if (!result.ok) {
+          throw new Error("Failed to upload image");
+        }
+
+        const { storageId } = await result.json();
+
+        values.image = storageId;
       }
-    );
 
-    setEditorKey((prevKey) => prevKey + 1);
+      await createMessageMutate(values, { throwError: true });
+
+      setEditorKey((prevKey) => prevKey + 1);
+    } catch (error) {
+      console.error(error);
+
+      toast({
+        variant: "destructive",
+        title: "Uh oh! Something went wrong.",
+        description: "There was a problem with your request.",
+      });
+    } finally {
+      setIsPending(false);
+
+      editorRef.current?.enable(true);
+    }
   };
 
   return (
