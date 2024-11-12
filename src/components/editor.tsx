@@ -95,7 +95,20 @@ export const Editor = ({
             enter: {
               key: "Enter",
               handler: () => {
-                return;
+                const text = quill.getText();
+                const addedImage = imageElementRef.current?.files?.[0] || null;
+
+                const isEmpty =
+                  !addedImage &&
+                  text.replace(/<(.|\n)*?>/g, "").trim().length === 0;
+
+                if (isEmpty) {
+                  return;
+                }
+
+                const body = JSON.stringify(quill.getContents());
+
+                submitRef.current({ body, image: addedImage });
               },
             },
             shift_enter: {
@@ -144,7 +157,7 @@ export const Editor = ({
     };
   }, [innerRef]);
 
-  const isEmpty = text.replace(/<(.|\n)*?>/g, "").trim().length === 0;
+  const isEmpty = !image && text.replace(/<(.|\n)*?>/g, "").trim().length === 0;
 
   return (
     <div className="flex flex-col">
@@ -155,7 +168,14 @@ export const Editor = ({
         ref={imageElementRef}
         type="file"
       />
-      <div className="flex flex-col border border-slate-200 rounded-md overflow-hidden focus-within:border-slate-300 focus-within:shadow-sm transition bg-white">
+      <div
+        className={cn(
+          "flex flex-col border border-slate-200 rounded-md overflow-hidden focus-within:border-slate-300 focus-within:shadow-sm transition bg-white",
+          {
+            "opacity-50": disabled,
+          }
+        )}
+      >
         <div ref={containerRef} className="h-full ql-custom" />
         {!!image && (
           <div className="p-2">
@@ -214,7 +234,7 @@ export const Editor = ({
             <div className="ml-auto flex items-center gap-x-2">
               <Button
                 disabled={disabled}
-                onClick={() => {}}
+                onClick={onCancel}
                 size="sm"
                 variant="outline"
               >
@@ -223,7 +243,12 @@ export const Editor = ({
               <Button
                 className="bg-[#007A5A] hover:bg-[#007A5A]/80 text-white"
                 disabled={disabled || isEmpty}
-                onClick={() => {}}
+                onClick={() =>
+                  onSubmit({
+                    body: JSON.stringify(quillRef.current?.getContents()),
+                    image,
+                  })
+                }
                 size="sm"
                 variant="outline"
               >
@@ -240,7 +265,12 @@ export const Editor = ({
                   : "bg-[#007A5A] hover:bg-[#007A5A]/80 text-white"
               )}
               disabled={disabled || isEmpty}
-              onClick={() => {}}
+              onClick={() =>
+                onSubmit({
+                  body: JSON.stringify(quillRef.current?.getContents()),
+                  image,
+                })
+              }
               size="sm"
             >
               <SendHorizonal className="size-4" />
