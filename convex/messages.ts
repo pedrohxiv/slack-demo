@@ -10,6 +10,7 @@ export const create = mutation({
     image: v.optional(v.string()),
     workspaceId: v.string(),
     channelId: v.optional(v.string()),
+    conversationId: v.optional(v.string()),
     parentMessageId: v.optional(v.string()),
   },
   handler: async (ctx, args) => {
@@ -28,8 +29,22 @@ export const create = mutation({
       )
       .unique();
 
-    if (!member || member.role !== "admin") {
+    if (!member) {
       throw new Error("Unauthorized");
+    }
+
+    let _conversationId = args.conversationId;
+
+    if (!args.conversationId && !args.channelId && args.parentMessageId) {
+      const parentMessage = await ctx.db.get(
+        args.parentMessageId as Id<"messages">
+      );
+
+      if (!parentMessage) {
+        throw new Error("Parent message not found");
+      }
+
+      _conversationId = parentMessage.conversationId;
     }
 
     const messageId = await ctx.db.insert("messages", {
@@ -38,6 +53,7 @@ export const create = mutation({
       memberId: member._id,
       workspaceId: args.workspaceId as Id<"workspaces">,
       channelId: args.channelId as Id<"channels">,
+      conversationId: _conversationId as Id<"conversations">,
       parentMessageId: args.parentMessageId as Id<"messages">,
       updatedAt: Date.now(),
     });

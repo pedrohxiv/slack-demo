@@ -32,6 +32,7 @@ export const createMessage = () => {
         image?: string;
         workspaceId: string;
         channelId?: string;
+        conversationId?: string;
         parentMessageId?: string;
       },
       options?: Options
