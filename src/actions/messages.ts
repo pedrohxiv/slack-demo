@@ -1,4 +1,4 @@
-import { useMutation } from "convex/react";
+import { useMutation, usePaginatedQuery } from "convex/react";
 import { useCallback, useMemo, useState } from "react";
 
 import { api } from "../../convex/_generated/api";
@@ -65,4 +65,25 @@ export const createMessage = () => {
   );
 
   return { mutate, data, error, isPending, isSuccess, isError, isSettled };
+};
+
+export type GetMessagesReturnType =
+  (typeof api.messages.get._returnType)["page"];
+
+export const getMessages = ({
+  channelId,
+  conversationId,
+  parentMessageId,
+}: {
+  channelId?: string;
+  conversationId?: string;
+  parentMessageId?: string;
+}) => {
+  const { results, status, loadMore } = usePaginatedQuery(
+    api.messages.get,
+    { channelId, conversationId, parentMessageId },
+    { initialNumItems: 20 }
+  );
+
+  return { results, status, loadMore: () => loadMore(20) };
 };

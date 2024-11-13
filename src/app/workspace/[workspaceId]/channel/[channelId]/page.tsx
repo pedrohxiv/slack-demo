@@ -5,6 +5,7 @@ import { useParams } from "next/navigation";
 
 import { getChannel } from "@/actions/channels";
 
+import { getMessages } from "@/actions/messages";
 import { ChatInput } from "./_components/chat-input";
 import { Header } from "./_components/header";
 
@@ -12,6 +13,9 @@ const ChannelPage = () => {
   const params = useParams<{ workspaceId: string; channelId: string }>();
 
   const { data, isLoading } = getChannel({ id: params.channelId });
+  const { results } = getMessages({ channelId: params.channelId });
+
+  console.log({results})
 
   if (isLoading) {
     return null;
@@ -31,7 +35,7 @@ const ChannelPage = () => {
   return (
     <div className="flex flex-col h-full">
       <Header title={data.name} />
-      <div className="flex-1" />
+      <div className="flex-1">{JSON.stringify(results)}</div>
       <ChatInput placeholder={`Message # ${data.name}`} />
     </div>
   );
