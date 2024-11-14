@@ -6,6 +6,7 @@ import { formatFullTime } from "@/lib/utils";
 
 import { Renderer } from "./renderer";
 import { Thumbnail } from "./thumbnail";
+import { Toolbar } from "./toolbar";
 
 interface Props {
   id: string;
@@ -108,6 +109,17 @@ export const Message = ({
           )}
         </div>
       </div>
+      {!isEditing && (
+        <Toolbar
+          isAuthor={isAuthor}
+          isPending={false}
+          handleEdit={() => setEditingId(id)}
+          handleThread={() => {}}
+          handleDelete={() => {}}
+          handleReaction={() => {}}
+          hideThreadButton={hideThreadButton}
+        />
+      )}
     </div>
   );
 };
