@@ -1,24 +1,29 @@
 "use client";
 
-import { TriangleAlert } from "lucide-react";
+import { Loader2, TriangleAlert } from "lucide-react";
 import { useParams } from "next/navigation";
 
 import { getChannel } from "@/actions/channels";
-
 import { getMessages } from "@/actions/messages";
+
 import { ChatInput } from "./_components/chat-input";
 import { Header } from "./_components/header";
+import { MessageList } from "./_components/message-list";
 
 const ChannelPage = () => {
   const params = useParams<{ workspaceId: string; channelId: string }>();
 
   const { data, isLoading } = getChannel({ id: params.channelId });
-  const { results } = getMessages({ channelId: params.channelId });
+  const { results, status, loadMore } = getMessages({
+    channelId: params.channelId,
+  });
 
-  console.log({results})
-
-  if (isLoading) {
-    return null;
+  if (isLoading || status === "LoadingFirstPage") {
+    return (
+      <div className="h-full flex-1 flex items-center justify-center">
+        <Loader2 className="animate-spin size-5 text-muted-foreground" />
+      </div>
+    );
   }
 
   if (!data) {
@@ -35,7 +40,14 @@ const ChannelPage = () => {
   return (
     <div className="flex flex-col h-full">
       <Header title={data.name} />
-      <div className="flex-1">{JSON.stringify(results)}</div>
+      <MessageList
+        channelName={data.name}
+        channelCreationTime={data._creationTime}
+        data={results}
+        loadMore={loadMore}
+        isLoadingMore={status === "LoadingMore"}
+        canLoadMore={status === "CanLoadMore"}
+      />
       <ChatInput placeholder={`Message # ${data.name}`} />
     </div>
   );

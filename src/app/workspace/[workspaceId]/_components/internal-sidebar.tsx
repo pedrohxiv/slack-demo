@@ -302,9 +302,9 @@ export const InternalSidebar = () => {
               variant="transparent"
             >
               <Link href={`/workspace/${params.workspaceId}/member/id`}>
-                <Avatar className="size-5 rounded-md mr-1">
-                  <AvatarImage className="rounded-md" src={item.user.image} />
-                  <AvatarFallback className="rounded-md bg-sky-500 text-white text-xs">
+                <Avatar className="size-5 mr-1">
+                  <AvatarImage src={item.user.image} />
+                  <AvatarFallback>
                     {item.user.name?.charAt(0).toUpperCase()}
                   </AvatarFallback>
                 </Avatar>
