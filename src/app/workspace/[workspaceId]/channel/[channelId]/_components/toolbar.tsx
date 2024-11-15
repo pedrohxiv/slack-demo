@@ -36,7 +36,12 @@ export const Toolbar = ({
         </EmojiPopover>
         {!hideThreadButton && (
           <Hint label="Reply in thread">
-            <Button disabled={isPending} size="icon" variant="ghost">
+            <Button
+              disabled={isPending}
+              onClick={handleThread}
+              size="icon"
+              variant="ghost"
+            >
               <MessageSquareText className="size-4" />
             </Button>
           </Hint>
@@ -44,12 +49,22 @@ export const Toolbar = ({
         {isAuthor && (
           <>
             <Hint label="Edit message">
-              <Button disabled={isPending} size="icon" variant="ghost">
+              <Button
+                disabled={isPending}
+                onClick={handleEdit}
+                size="icon"
+                variant="ghost"
+              >
                 <Pencil className="size-4" />
               </Button>
             </Hint>
             <Hint label="Delete message">
-              <Button disabled={isPending} size="icon" variant="ghost">
+              <Button
+                disabled={isPending}
+                onClick={handleDelete}
+                size="icon"
+                variant="ghost"
+              >
                 <Trash className="size-4" />
               </Button>
             </Hint>

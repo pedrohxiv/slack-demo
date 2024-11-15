@@ -26,8 +26,10 @@ export const Preferences = ({ initialValue, open, setOpen }: Props) => {
   const params = useParams<{ workspaceId: string }>();
   const router = useRouter();
 
-  const { mutate: updateMutate, isPending: updateIsPeding } = updateWorkspace();
-  const { mutate: removeMutate, isPending: removeIsPeding } = removeWorkspace();
+  const { mutate: updateMutate, isPending: updateIsPending } =
+    updateWorkspace();
+  const { mutate: removeMutate, isPending: removeIsPending } =
+    removeWorkspace();
   const { toast } = useToast();
 
   const handleEdit = (e: React.FormEvent<HTMLFormElement>) => {
@@ -91,7 +93,7 @@ export const Preferences = ({ initialValue, open, setOpen }: Props) => {
                 "px-5 py-4 bg-white rounded-lg border cursor-pointer hover:bg-gray-50",
                 {
                   "pointer-events-none opacity-50":
-                    updateIsPeding || removeIsPeding,
+                    updateIsPending || removeIsPending,
                 }
               )}
               onClick={() => setIsEditing(true)}
@@ -111,7 +113,7 @@ export const Preferences = ({ initialValue, open, setOpen }: Props) => {
             >
               <Input
                 autoFocus
-                disabled={updateIsPeding || removeIsPeding}
+                disabled={updateIsPending || removeIsPending}
                 minLength={3}
                 maxLength={80}
                 onChange={(e) => setValue(e.target.value)}
@@ -122,7 +124,7 @@ export const Preferences = ({ initialValue, open, setOpen }: Props) => {
               <X
                 className={cn("absolute right-2 cursor-pointer", {
                   "pointer-events-none opacity-50":
-                    updateIsPeding || removeIsPeding,
+                    updateIsPending || removeIsPending,
                 })}
                 onClick={() => {
                   setIsEditing(false);
@@ -133,7 +135,7 @@ export const Preferences = ({ initialValue, open, setOpen }: Props) => {
           )}
           <button
             className="flex items-center gap-x-2 px-5 py-4 bg-white rounded-lg border cursor-pointer hover:bg-gray-50 text-rose-600 disabled:pointer-events-none disabled:opacity-50"
-            disabled={updateIsPeding || removeIsPeding}
+            disabled={updateIsPending || removeIsPending}
             onClick={handleRemove}
           >
             <Trash className="size-4" />

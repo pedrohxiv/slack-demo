@@ -211,3 +211,79 @@ export const get = query({
     };
   },
 });
+
+export const update = mutation({
+  args: {
+    id: v.string(),
+    body: v.string(),
+  },
+  handler: async (ctx, args) => {
+    const userId = await getAuthUserId(ctx);
+
+    if (!userId) {
+      throw new Error("Unauthorized");
+    }
+
+    const message = await ctx.db.get(args.id as Id<"messages">);
+
+    if (!message) {
+      throw new Error("Message not found");
+    }
+
+    const member = await ctx.db
+      .query("members")
+      .withIndex("by_workspace_id_user_id", (q) =>
+        q
+          .eq("workspaceId", message.workspaceId as Id<"workspaces">)
+          .eq("userId", userId)
+      )
+      .unique();
+
+    if (!member || member._id !== message.memberId) {
+      throw new Error("Unauthorized");
+    }
+
+    await ctx.db.patch(args.id as Id<"messages">, {
+      body: args.body,
+      updatedAt: Date.now(),
+    });
+
+    return args.id as Id<"messages">;
+  },
+});
+
+export const remove = mutation({
+  args: {
+    id: v.string(),
+  },
+  handler: async (ctx, args) => {
+    const userId = await getAuthUserId(ctx);
+
+    if (!userId) {
+      throw new Error("Unauthorized");
+    }
+
+    const message = await ctx.db.get(args.id as Id<"messages">);
+
+    if (!message) {
+      throw new Error("Message not found");
+    }
+
+    const member = await ctx.db
+      .query("members")
+      .withIndex("by_workspace_id_user_id", (q) =>
+        q
+          .eq("workspaceId", message.workspaceId as Id<"workspaces">)
+          .eq("userId", userId)
+      )
+      .unique();
+
+    if (!member || member._id !== message.memberId) {
+      throw new Error("Unauthorized");
+    }
+
+    await ctx.db.delete(args.id as Id<"messages">);
+
+    return args.id as Id<"messages">;
+  },
+});
