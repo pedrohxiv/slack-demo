@@ -1,6 +1,6 @@
 "use client";
 
-import { Loader2, TriangleAlert } from "lucide-react";
+import { TriangleAlert } from "lucide-react";
 import { useParams, useRouter } from "next/navigation";
 import { useEffect, useMemo } from "react";
 
@@ -59,11 +59,7 @@ const WorkspacePage = () => {
   ]);
 
   if (memberIsLoading || workspaceIsLoading || channelsIsLoading) {
-    return (
-      <div className="h-full flex-1 flex items-center justify-center flex-col gap-2">
-        <Loader2 className="size-6 animate-spin text-muted-foreground" />
-      </div>
-    );
+    return null;
   }
 
   if (!memberData || !workspaceData) {

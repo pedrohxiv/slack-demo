@@ -1,12 +1,14 @@
 import { format } from "date-fns";
 
 import { removeMessage, updateMessage } from "@/actions/messages";
+import { toggleReaction } from "@/actions/reactions";
 import { Editor } from "@/components/editor";
 import { Hint } from "@/components/hint";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useToast } from "@/hooks/use-toast";
 import { cn, formatFullTime } from "@/lib/utils";
 
+import { Reactions } from "./reactions";
 import { Renderer } from "./renderer";
 import { Thumbnail } from "./thumbnail";
 import { Toolbar } from "./toolbar";
@@ -60,6 +62,7 @@ export const Message = ({
 }: Props) => {
   const { mutate: updateMutate, isPending: updateIsPending } = updateMessage();
   const { mutate: removeMutate, isPending: removeIsPending } = removeMessage();
+  const { mutate: toggleMutate, isPending: toggleIsPending } = toggleReaction();
   const { toast } = useToast();
 
   const handleUpdate = ({ body }: { body: string }) => {
@@ -87,6 +90,23 @@ export const Message = ({
       { id },
       {
         onSuccess: () => {},
+        onError: (error) => {
+          console.error(error);
+
+          toast({
+            variant: "destructive",
+            title: "Uh oh! Something went wrong.",
+            description: "There was a problem with your request.",
+          });
+        },
+      }
+    );
+  };
+
+  const handleReaction = (value: string) => {
+    toggleMutate(
+      { messageId: id, value },
+      {
         onError: (error) => {
           console.error(error);
 
@@ -135,6 +155,7 @@ export const Message = ({
               {updatedAt && (
                 <span className="text-xs text-muted-foreground">(edited)</span>
               )}
+              <Reactions data={reactions} onChange={handleReaction} />
             </div>
           )}
         </div>
@@ -145,7 +166,7 @@ export const Message = ({
             handleEdit={() => setEditingId(id)}
             handleThread={() => {}}
             handleDelete={handleRemove}
-            handleReaction={() => {}}
+            handleReaction={handleReaction}
             hideThreadButton={hideThreadButton}
           />
         )}
@@ -168,7 +189,7 @@ export const Message = ({
         <button>
           <Avatar>
             <AvatarImage src={authorImage} />
-            <AvatarFallback>
+            <AvatarFallback className="text-xl">
               {authorName.charAt(0).toUpperCase()}
             </AvatarFallback>
           </Avatar>
@@ -204,6 +225,7 @@ export const Message = ({
             {updatedAt && (
               <span className="text-xs text-muted-foreground">(edited)</span>
             )}
+            <Reactions data={reactions} onChange={handleReaction} />
           </div>
         )}
       </div>
@@ -214,7 +236,7 @@ export const Message = ({
           handleEdit={() => setEditingId(id)}
           handleThread={() => {}}
           handleDelete={handleRemove}
-          handleReaction={() => {}}
+          handleReaction={handleReaction}
           hideThreadButton={hideThreadButton}
         />
       )}

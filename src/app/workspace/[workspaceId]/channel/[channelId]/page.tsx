@@ -1,6 +1,6 @@
 "use client";
 
-import { Loader2, TriangleAlert } from "lucide-react";
+import { TriangleAlert } from "lucide-react";
 import { useParams } from "next/navigation";
 
 import { getChannel } from "@/actions/channels";
@@ -19,11 +19,7 @@ const ChannelPage = () => {
   });
 
   if (isLoading || status === "LoadingFirstPage") {
-    return (
-      <div className="h-full flex-1 flex items-center justify-center">
-        <Loader2 className="animate-spin size-5 text-muted-foreground" />
-      </div>
-    );
+    return null;
   }
 
   if (!data) {

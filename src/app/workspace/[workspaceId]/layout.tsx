@@ -23,13 +23,13 @@ const WorkspaceLayout = ({ children }: Props) => {
         <ResizablePanelGroup direction="horizontal">
           <ResizablePanel
             className="bg-[#5E2C5F]"
-            defaultSize={20}
-            minSize={15}
+            defaultSize={24.15}
+            minSize={14.2}
           >
             <InternalSidebar />
           </ResizablePanel>
-          <ResizableHandle withHandle />
-          <ResizablePanel defaultSize={80} minSize={30}>
+          <ResizableHandle />
+          <ResizablePanel defaultSize={75.85} minSize={24.15}>
             {children}
           </ResizablePanel>
         </ResizablePanelGroup>

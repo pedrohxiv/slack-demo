@@ -1,8 +1,9 @@
-import { ChevronDown, Trash, X } from "lucide-react";
+import { Trash, X } from "lucide-react";
 import { useState } from "react";
 
 import { removeChannel, updateChannel } from "@/actions/channels";
 import { getCurrentMember } from "@/actions/members";
+import { Hint } from "@/components/hint";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -87,14 +88,15 @@ export const Header = ({ title }: Props) => {
       ) : (
         <Dialog>
           <DialogTrigger asChild>
-            <Button
-              className="text-lg font-semibold px-2 overflow-hidden w-auto"
-              size="sm"
-              variant="ghost"
-            >
-              <span className="truncate"># {title}</span>
-              <ChevronDown className="size-2.5 ml-2 shrink-0" />
-            </Button>
+            <Hint label="Get channel details" side="bottom">
+              <Button
+                className="text-lg font-semibold px-2 overflow-hidden w-auto"
+                size="sm"
+                variant="ghost"
+              >
+                <span className="truncate"># {title}</span>
+              </Button>
+            </Hint>
           </DialogTrigger>
           <DialogContent className="p-0 bg-gray-50 overflow-hidden">
             <DialogHeader className="p-4 border-b bg-white">
