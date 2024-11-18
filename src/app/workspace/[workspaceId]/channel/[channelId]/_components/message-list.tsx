@@ -7,8 +7,8 @@ import { getCurrentMember } from "@/actions/members";
 import { GetMessagesReturnType } from "@/actions/messages";
 import { formatDateLabel } from "@/lib/utils";
 
+import { Message } from "../../../../../../components/message";
 import { ChannelHero } from "./channel-hero";
-import { Message } from "./message";
 
 interface Props {
   memberName?: string;

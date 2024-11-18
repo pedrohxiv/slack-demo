@@ -212,6 +212,94 @@ export const get = query({
   },
 });
 
+export const getById = query({
+  args: {
+    id: v.string(),
+  },
+  handler: async (ctx, args) => {
+    const userId = await getAuthUserId(ctx);
+
+    if (!userId) {
+      return null;
+    }
+
+    const message = await ctx.db.get(args.id as Id<"messages">);
+
+    if (!message) {
+      return null;
+    }
+
+    const currentMember = await ctx.db
+      .query("members")
+      .withIndex("by_workspace_id_user_id", (q) =>
+        q
+          .eq("workspaceId", message.workspaceId as Id<"workspaces">)
+          .eq("userId", userId)
+      )
+      .unique();
+
+    if (!currentMember) {
+      return null;
+    }
+
+    const member = await ctx.db.get(message.memberId);
+
+    if (!member) {
+      return null;
+    }
+
+    const user = await ctx.db.get(member.userId);
+
+    if (!user) {
+      return null;
+    }
+
+    const reactions = await ctx.db
+      .query("reactions")
+      .withIndex("by_message_id", (q) => q.eq("messageId", message._id))
+      .collect();
+
+    const reactionsWithCounts = reactions.map((reaction) => ({
+      ...reaction,
+      count: reactions.filter((r) => r.value === reaction.value).length,
+    }));
+
+    const dedupedReactions = reactionsWithCounts.reduce(
+      (acc, reaction) => {
+        const existingReaction = acc.find((r) => r.value === reaction.value);
+
+        if (existingReaction) {
+          existingReaction.memberIds = Array.from(
+            new Set([...existingReaction.memberIds, reaction.memberId])
+          );
+        } else {
+          acc.push({ ...reaction, memberIds: [reaction.memberId] });
+        }
+
+        return acc;
+      },
+      [] as (Doc<"reactions"> & {
+        count: number;
+        memberIds: Id<"members">[];
+      })[]
+    );
+
+    const reactionsWithoutMemberIdProperty = dedupedReactions.map(
+      ({ memberId, ...rest }) => rest
+    );
+
+    return {
+      ...message,
+      image: message.image
+        ? await ctx.storage.getUrl(message.image)
+        : undefined,
+      member,
+      user,
+      reactions: reactionsWithoutMemberIdProperty,
+    };
+  },
+});
+
 export const update = mutation({
   args: {
     id: v.string(),

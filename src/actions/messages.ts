@@ -1,4 +1,4 @@
-import { useMutation, usePaginatedQuery } from "convex/react";
+import { useMutation, usePaginatedQuery, useQuery } from "convex/react";
 import { useCallback, useMemo, useState } from "react";
 
 import { api } from "../../convex/_generated/api";
@@ -86,6 +86,14 @@ export const getMessages = ({
   );
 
   return { results, status, loadMore: () => loadMore(20) };
+};
+
+export const getMessage = ({ id }: { id: string }) => {
+  const data = useQuery(api.messages.getById, { id });
+
+  const isLoading = data === undefined;
+
+  return { data, isLoading };
 };
 
 export const updateMessage = () => {

@@ -82,7 +82,7 @@ export const Header = ({ title }: Props) => {
   return (
     <div className="bg-white border-b h-[49px] flex items-center px-4 overflow-hidden">
       {data?.role !== "admin" ? (
-        <span className="text-lg font-semibold px-2 overflow-hidden w-auto truncate">
+        <span className="text-lg font-bold px-2 overflow-hidden w-auto truncate">
           # {title}
         </span>
       ) : (
@@ -90,7 +90,7 @@ export const Header = ({ title }: Props) => {
           <DialogTrigger asChild>
             <Hint label="Get channel details" side="bottom">
               <Button
-                className="text-lg font-semibold px-2 overflow-hidden w-auto"
+                className="text-lg font-bold px-2 overflow-hidden w-auto"
                 size="sm"
                 variant="ghost"
               >

@@ -4,14 +4,14 @@ import { removeMessage, updateMessage } from "@/actions/messages";
 import { toggleReaction } from "@/actions/reactions";
 import { Editor } from "@/components/editor";
 import { Hint } from "@/components/hint";
+import { Reactions } from "@/components/reactions";
+import { Renderer } from "@/components/renderer";
+import { Thumbnail } from "@/components/thumbnail";
+import { Toolbar } from "@/components/toolbar";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { usePanel } from "@/hooks/use-panel";
 import { useToast } from "@/hooks/use-toast";
 import { cn, formatFullTime } from "@/lib/utils";
-
-import { Reactions } from "./reactions";
-import { Renderer } from "./renderer";
-import { Thumbnail } from "./thumbnail";
-import { Toolbar } from "./toolbar";
 
 interface Props {
   id: string;
@@ -63,6 +63,7 @@ export const Message = ({
   const { mutate: updateMutate, isPending: updateIsPending } = updateMessage();
   const { mutate: removeMutate, isPending: removeIsPending } = removeMessage();
   const { mutate: toggleMutate, isPending: toggleIsPending } = toggleReaction();
+  const { parentMessageId, onOpenMessage, onClose } = usePanel();
   const { toast } = useToast();
 
   const handleUpdate = ({ body }: { body: string }) => {
@@ -89,7 +90,11 @@ export const Message = ({
     removeMutate(
       { id },
       {
-        onSuccess: () => {},
+        onSuccess: () => {
+          if (parentMessageId === id) {
+            onClose();
+          }
+        },
         onError: (error) => {
           console.error(error);
 
@@ -164,7 +169,7 @@ export const Message = ({
             isAuthor={isAuthor}
             isPending={updateIsPending || removeIsPending}
             handleEdit={() => setEditingId(id)}
-            handleThread={() => {}}
+            handleThread={() => onOpenMessage(id)}
             handleDelete={handleRemove}
             handleReaction={handleReaction}
             hideThreadButton={hideThreadButton}
@@ -234,7 +239,7 @@ export const Message = ({
           isAuthor={isAuthor}
           isPending={updateIsPending || removeIsPending}
           handleEdit={() => setEditingId(id)}
-          handleThread={() => {}}
+          handleThread={() => onOpenMessage(id)}
           handleDelete={handleRemove}
           handleReaction={handleReaction}
           hideThreadButton={hideThreadButton}
