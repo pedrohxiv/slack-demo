@@ -39,7 +39,6 @@ export const ChatInput = ({ placeholder }: Props) => {
         image?: string;
         workspaceId: string;
         channelId?: string;
-        parentMessageId?: string;
       } = {
         body,
         image: undefined,

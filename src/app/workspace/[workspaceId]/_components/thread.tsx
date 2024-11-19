@@ -1,11 +1,17 @@
-import { X } from "lucide-react";
+import { differenceInMinutes, format } from "date-fns";
+import { Loader2, X } from "lucide-react";
 import { useParams } from "next/navigation";
-import { useState } from "react";
+import Quill from "quill";
+import { useRef, useState } from "react";
 
 import { getCurrentMember } from "@/actions/members";
-import { getMessage } from "@/actions/messages";
+import { createMessage, getMessage, getMessages } from "@/actions/messages";
+import { generateUploadUrl } from "@/actions/upload";
+import { Editor } from "@/components/editor";
 import { Message } from "@/components/message";
 import { Button } from "@/components/ui/button";
+import { useToast } from "@/hooks/use-toast";
+import { formatDateLabel } from "@/lib/utils";
 
 interface Props {
   messageId: string;
@@ -14,8 +20,11 @@ interface Props {
 
 export const Thread = ({ messageId, onClose }: Props) => {
   const [editingId, setEditingId] = useState<string | null>(null);
+  const [isPending, setIsPending] = useState<boolean>(false);
+  const [editorKey, setEditorKey] = useState<number>(0);
 
-  const params = useParams<{ workspaceId: string }>();
+  const params = useParams<{ workspaceId: string; channelId: string }>();
+  const editorRef = useRef<Quill | null>(null);
 
   const { data: memberData, isLoading: memberIsLoading } = getCurrentMember({
     workspaceId: params.workspaceId,
@@ -23,8 +32,104 @@ export const Thread = ({ messageId, onClose }: Props) => {
   const { data: messageData, isLoading: messageIsLoading } = getMessage({
     id: messageId,
   });
+  const { results, status, loadMore } = getMessages({
+    channelId: params.channelId,
+    parentMessageId: messageId,
+  });
+  const { mutate: generateUploadUrlMutate } = generateUploadUrl();
+  const { mutate: createMessageMutate } = createMessage();
+  const { toast } = useToast();
 
-  if (!memberData || memberIsLoading || !messageData || messageIsLoading) {
+  const groupedMessages = results?.reduce(
+    (groups, message) => {
+      const date = new Date(message._creationTime);
+
+      const dateKey = format(date, "yyyy-MM-dd");
+
+      if (!groups[dateKey]) {
+        groups[dateKey] = [];
+      }
+
+      groups[dateKey].unshift(message);
+
+      return groups;
+    },
+    {} as Record<string, typeof results>
+  );
+
+  const handleSubmit = async ({
+    body,
+    image,
+  }: {
+    body: string;
+    image: File | null;
+  }) => {
+    try {
+      setIsPending(true);
+
+      editorRef.current?.enable(false);
+
+      const values: {
+        body: string;
+        image?: string;
+        workspaceId: string;
+        channelId?: string;
+        parentMessageId?: string;
+      } = {
+        body,
+        image: undefined,
+        workspaceId: params.workspaceId,
+        channelId: params.channelId,
+        parentMessageId: messageId,
+      };
+
+      if (image) {
+        const url = await generateUploadUrlMutate({ throwError: true });
+
+        if (!url) {
+          throw new Error("Url not found");
+        }
+
+        const result = await fetch(url, {
+          method: "POST",
+          headers: { "Content-Type": image.type },
+          body: image,
+        });
+
+        if (!result.ok) {
+          throw new Error("Failed to upload image");
+        }
+
+        const { storageId } = await result.json();
+
+        values.image = storageId;
+      }
+
+      await createMessageMutate(values, { throwError: true });
+
+      setEditorKey((prevKey) => prevKey + 1);
+    } catch (error) {
+      console.error(error);
+
+      toast({
+        variant: "destructive",
+        title: "Uh oh! Something went wrong.",
+        description: "There was a problem with your request.",
+      });
+    } finally {
+      setIsPending(false);
+
+      editorRef.current?.enable(true);
+    }
+  };
+
+  if (
+    !memberData ||
+    memberIsLoading ||
+    !messageData ||
+    messageIsLoading ||
+    status === "LoadingFirstPage"
+  ) {
     return null;
   }
 
@@ -36,7 +141,77 @@ export const Thread = ({ messageId, onClose }: Props) => {
           <X className="size-5 stroke-[1.5]" />
         </Button>
       </div>
-      <div>
+      <div className="flex-1 flex flex-col-reverse pb-4 overflow-y-auto messages-scrollbar">
+        {Object.entries(groupedMessages || {}).map(([dateKey, messages]) => (
+          <div key={dateKey}>
+            <div className="text-center my-2 relative">
+              <hr className="absolute top-1/2 left-0 right-0 border-t border-gray-300" />
+              <span className="relative inline-block bg-white px-4 py-1 rounded-full text-xs border border-gray-300 shadow-sm">
+                {formatDateLabel(dateKey)}
+              </span>
+            </div>
+            {messages.map((message, index) => {
+              const prevMessage = messages[index - 1];
+
+              const isCompact =
+                prevMessage &&
+                prevMessage.user._id === message.user._id &&
+                differenceInMinutes(
+                  new Date(message._creationTime),
+                  new Date(prevMessage._creationTime)
+                ) < 5;
+
+              return (
+                <Message
+                  key={message._id}
+                  id={message._id}
+                  memberId={message.memberId}
+                  authorImage={message.user.image}
+                  authorName={message.user.name}
+                  isAuthor={message.memberId === memberData?._id}
+                  reactions={message.reactions}
+                  body={message.body}
+                  image={message.image}
+                  updatedAt={message.updatedAt}
+                  createdAt={message._creationTime}
+                  isEditing={editingId === message._id}
+                  setEditingId={setEditingId}
+                  isCompact={isCompact}
+                  hideThreadButton
+                  threadCount={message.threadCount}
+                  threadImage={message.threadImage}
+                  threadTimestamp={message.threadTimestamp}
+                />
+              );
+            })}
+          </div>
+        ))}
+        <div
+          className="h-1"
+          ref={(element) => {
+            if (element) {
+              const observer = new IntersectionObserver(
+                ([entry]) => {
+                  if (entry.isIntersecting && status === "CanLoadMore") {
+                    loadMore();
+                  }
+                },
+                { threshold: 1.0 }
+              );
+              observer.observe(element);
+
+              return () => observer.disconnect();
+            }
+          }}
+        />
+        {status === "LoadingMore" && (
+          <div className="text-center my-2 relative">
+            <hr className="absolute top-1/2 left-0 right-0 border-t border-gray-300" />
+            <span className="relative inline-block bg-white px-4 py-1 rounded-full text-xs border border-gray-300 shadow-sm">
+              <Loader2 className="size-4 animate-spin" />
+            </span>
+          </div>
+        )}
         <Message
           id={messageData._id}
           memberId={messageData.memberId}
@@ -51,6 +226,15 @@ export const Thread = ({ messageId, onClose }: Props) => {
           isEditing={editingId === messageData._id}
           setEditingId={setEditingId}
           hideThreadButton
+        />
+      </div>
+      <div className="px-4">
+        <Editor
+          key={editorKey}
+          onSubmit={handleSubmit}
+          disabled={isPending}
+          innerRef={editorRef}
+          placeholder="Reply"
         />
       </div>
     </div>
