@@ -37,7 +37,11 @@ export const InternalSidebar = () => {
   const [messagesOpen, setMessagesOpen] = useState<boolean>(true);
   const [_, setCreateChannelOpen] = useCreateChannel();
 
-  const params = useParams<{ workspaceId: string; channelId: string }>();
+  const params = useParams<{
+    workspaceId: string;
+    channelId: string;
+    memberId: string;
+  }>();
 
   const { data: memberData, isLoading: memberIsLoading } = getCurrentMember({
     workspaceId: params.workspaceId,
@@ -263,13 +267,16 @@ export const InternalSidebar = () => {
               className={cn(
                 "flex items-center gap-1.5 justify-start font-normal h-7 px-4 text-sm overflow-hidden text-[#F9EDFFCC]",
                 {
-                  "text-[#481349] bg-white/90 hover:bg-white/90": false,
+                  "text-[#481349] bg-white/90 hover:bg-white/90":
+                    params.memberId === item._id,
                 }
               )}
               size="sm"
               variant="transparent"
             >
-              <Link href={`/workspace/${params.workspaceId}/member/id`}>
+              <Link
+                href={`/workspace/${params.workspaceId}/member/${item._id}`}
+              >
                 <Avatar className="size-5 mr-1">
                   <AvatarImage src={item.user.image} />
                   <AvatarFallback>

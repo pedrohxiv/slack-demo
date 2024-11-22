@@ -5,10 +5,9 @@ import { useState } from "react";
 
 import { getCurrentMember } from "@/actions/members";
 import { GetMessagesReturnType } from "@/actions/messages";
+import { Message } from "@/components/message";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { formatDateLabel } from "@/lib/utils";
-
-import { Message } from "../../../../../../components/message";
-import { ChannelHero } from "./channel-hero";
 
 interface Props {
   memberName?: string;
@@ -131,7 +130,33 @@ export const MessageList = ({
         </div>
       )}
       {variant === "channel" && channelName && channelCreationTime && (
-        <ChannelHero name={channelName} creationTime={channelCreationTime} />
+        <div className="mt-[88px] mx-5 mb-4">
+          <p className="text-2xl font-bold flex items-center mb-2">
+            # {channelName}
+          </p>
+          <p className="font-normal text-slate-900 mb-4">
+            This channel was created on{" "}
+            {format(channelCreationTime, "MMMM do, yyyy")}. This is the very
+            beginning of the <strong>{channelName}</strong> channel.
+          </p>
+        </div>
+      )}
+      {variant === "conversation" && (
+        <div className="mt-[88px] mx-5 mb-4">
+          <div className="flex items-center gap-x-1 mb-2">
+            <Avatar className="size-14 mr-2">
+              <AvatarImage src={memberImage} />
+              <AvatarFallback className="text-3xl">
+                {memberName?.charAt(0).toUpperCase()}
+              </AvatarFallback>
+            </Avatar>
+            <p className="text-2xl font-bold">{memberName}</p>
+          </div>
+          <p className="font-normal text-slate-900 mb-4">
+            This conversation is just between you and{" "}
+            <strong>{memberName}</strong>.
+          </p>
+        </div>
       )}
     </div>
   );

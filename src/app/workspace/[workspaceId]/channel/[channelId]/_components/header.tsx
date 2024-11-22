@@ -1,4 +1,5 @@
 import { Trash, X } from "lucide-react";
+import { useParams, useRouter } from "next/navigation";
 import { useState } from "react";
 
 import { removeChannel, updateChannel } from "@/actions/channels";
@@ -15,7 +16,6 @@ import {
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
-import { useParams, useRouter } from "next/navigation";
 
 interface Props {
   title: string;

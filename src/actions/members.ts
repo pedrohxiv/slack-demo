@@ -17,3 +17,11 @@ export const getMembers = ({ workspaceId }: { workspaceId: string }) => {
 
   return { data, isLoading };
 };
+
+export const getMember = ({ id }: { id: string }) => {
+  const data = useQuery(api.members.getById, { id });
+
+  const isLoading = data === undefined;
+
+  return { data, isLoading };
+};

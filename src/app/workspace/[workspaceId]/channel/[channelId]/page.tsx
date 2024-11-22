@@ -6,9 +6,9 @@ import { useParams } from "next/navigation";
 import { getChannel } from "@/actions/channels";
 import { getMessages } from "@/actions/messages";
 
+import { MessageList } from "../../../../../components/message-list";
 import { ChatInput } from "./_components/chat-input";
 import { Header } from "./_components/header";
-import { MessageList } from "./_components/message-list";
 
 const ChannelPage = () => {
   const params = useParams<{ workspaceId: string; channelId: string }>();
