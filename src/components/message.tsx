@@ -6,6 +6,7 @@ import { Editor } from "@/components/editor";
 import { Hint } from "@/components/hint";
 import { Reactions } from "@/components/reactions";
 import { Renderer } from "@/components/renderer";
+import { ThreadBar } from "@/components/thread-bar";
 import { Thumbnail } from "@/components/thumbnail";
 import { Toolbar } from "@/components/toolbar";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -39,6 +40,7 @@ interface Props {
   threadCount?: number;
   threadImage?: string;
   threadTimestamp?: number;
+  threadName?: string;
 }
 
 export const Message = ({
@@ -59,6 +61,7 @@ export const Message = ({
   threadCount,
   threadImage,
   threadTimestamp,
+  threadName,
 }: Props) => {
   const { mutate: updateMutate, isPending: updateIsPending } = updateMessage();
   const { mutate: removeMutate, isPending: removeIsPending } = removeMessage();
@@ -161,6 +164,13 @@ export const Message = ({
                 <span className="text-xs text-muted-foreground">(edited)</span>
               )}
               <Reactions data={reactions} onChange={handleReaction} />
+              <ThreadBar
+                count={threadCount}
+                image={threadImage}
+                timestamp={threadTimestamp}
+                name={threadName}
+                onClick={() => onOpenMessage(id)}
+              />
             </div>
           )}
         </div>
@@ -231,6 +241,13 @@ export const Message = ({
               <span className="text-xs text-muted-foreground">(edited)</span>
             )}
             <Reactions data={reactions} onChange={handleReaction} />
+            <ThreadBar
+              count={threadCount}
+              image={threadImage}
+              timestamp={threadTimestamp}
+              name={threadName}
+              onClick={() => onOpenMessage(id)}
+            />
           </div>
         )}
       </div>

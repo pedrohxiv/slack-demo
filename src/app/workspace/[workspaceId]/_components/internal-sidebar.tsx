@@ -204,6 +204,7 @@ export const InternalSidebar = () => {
         {channelsOpen &&
           channelsData?.map((item) => (
             <Button
+              key={item._id}
               asChild
               className={cn(
                 "flex items-center gap-1.5 justify-start font-normal h-7 px-[18px] text-sm overflow-hidden text-[#F9EDFFCC]",
@@ -263,6 +264,7 @@ export const InternalSidebar = () => {
         {messagesOpen &&
           membersData.map((item) => (
             <Button
+              key={item._id}
               asChild
               className={cn(
                 "flex items-center gap-1.5 justify-start font-normal h-7 px-4 text-sm overflow-hidden text-[#F9EDFFCC]",
