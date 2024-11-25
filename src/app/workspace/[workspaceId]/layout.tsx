@@ -8,6 +8,7 @@ import {
 import { usePanel } from "@/hooks/use-panel";
 
 import { InternalSidebar } from "./_components/internal-sidebar";
+import { Profile } from "./_components/profile";
 import { Sidebar } from "./_components/sidebar";
 import { Thread } from "./_components/thread";
 import { Toolbar } from "./_components/toolbar";
@@ -17,9 +18,7 @@ interface Props {
 }
 
 const WorkspaceLayout = ({ children }: Props) => {
-  const { parentMessageId, onClose } = usePanel();
-
-  const showPanel = !!parentMessageId;
+  const { parentMessageId, profileMemberId, onClose } = usePanel();
 
   return (
     <div className="h-full">
@@ -30,7 +29,7 @@ const WorkspaceLayout = ({ children }: Props) => {
           <ResizablePanel
             className="bg-[#5E2C5F]"
             defaultSize={24.15}
-            minSize={14.2}
+            minSize={20}
           >
             <InternalSidebar />
           </ResizablePanel>
@@ -38,13 +37,15 @@ const WorkspaceLayout = ({ children }: Props) => {
           <ResizablePanel defaultSize={75.85} minSize={24.15}>
             {children}
           </ResizablePanel>
-          {showPanel && (
+          {(!!parentMessageId || !!profileMemberId) && (
             <>
               <ResizableHandle />
               <ResizablePanel defaultSize={24.15} minSize={20}>
-                {parentMessageId && (
+                {parentMessageId ? (
                   <Thread messageId={parentMessageId} onClose={onClose} />
-                )}
+                ) : profileMemberId ? (
+                  <Profile memberId={profileMemberId} onClose={onClose} />
+                ) : null}
               </ResizablePanel>
             </>
           )}

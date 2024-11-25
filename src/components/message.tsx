@@ -66,7 +66,7 @@ export const Message = ({
   const { mutate: updateMutate, isPending: updateIsPending } = updateMessage();
   const { mutate: removeMutate, isPending: removeIsPending } = removeMessage();
   const { mutate: toggleMutate, isPending: toggleIsPending } = toggleReaction();
-  const { parentMessageId, onOpenMessage, onClose } = usePanel();
+  const { parentMessageId, onOpenMessage, onOpenProfile, onClose } = usePanel();
   const { toast } = useToast();
 
   const handleUpdate = ({ body }: { body: string }) => {
@@ -151,7 +151,7 @@ export const Message = ({
               <Editor
                 onSubmit={handleUpdate}
                 defaultValue={JSON.parse(body)}
-                disabled={updateIsPending || removeIsPending}
+                disabled={updateIsPending || removeIsPending || toggleIsPending}
                 onCancel={() => setEditingId(null)}
                 variant="update"
               />
@@ -177,7 +177,7 @@ export const Message = ({
         {!isEditing && (
           <Toolbar
             isAuthor={isAuthor}
-            isPending={updateIsPending || removeIsPending}
+            isPending={updateIsPending || removeIsPending || toggleIsPending}
             handleEdit={() => setEditingId(id)}
             handleThread={() => onOpenMessage(id)}
             handleDelete={handleRemove}
@@ -201,7 +201,7 @@ export const Message = ({
       )}
     >
       <div className="flex items-start gap-2">
-        <button>
+        <button onClick={() => onOpenProfile(memberId)}>
           <Avatar>
             <AvatarImage src={authorImage} />
             <AvatarFallback className="text-xl">
@@ -214,7 +214,7 @@ export const Message = ({
             <Editor
               onSubmit={handleUpdate}
               defaultValue={JSON.parse(body)}
-              disabled={updateIsPending || removeIsPending}
+              disabled={updateIsPending || removeIsPending || toggleIsPending}
               onCancel={() => setEditingId(null)}
               variant="update"
             />
@@ -224,7 +224,7 @@ export const Message = ({
             <div className="text-sm">
               <button
                 className="font-bold text-primary hover:underline"
-                onClick={() => {}}
+                onClick={() => onOpenProfile(memberId)}
               >
                 {authorName}
               </button>
@@ -254,7 +254,7 @@ export const Message = ({
       {!isEditing && (
         <Toolbar
           isAuthor={isAuthor}
-          isPending={updateIsPending || removeIsPending}
+          isPending={updateIsPending || removeIsPending || toggleIsPending}
           handleEdit={() => setEditingId(id)}
           handleThread={() => onOpenMessage(id)}
           handleDelete={handleRemove}

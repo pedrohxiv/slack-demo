@@ -1,6 +1,5 @@
 "use client";
 
-import { TriangleAlert } from "lucide-react";
 import { useParams, useRouter } from "next/navigation";
 import { useEffect, useMemo } from "react";
 
@@ -58,27 +57,7 @@ const WorkspacePage = () => {
     params.workspaceId,
   ]);
 
-  if (memberIsLoading || workspaceIsLoading || channelsIsLoading) {
-    return null;
-  }
-
-  if (!memberData || !workspaceData) {
-    return (
-      <div className="h-full flex-1 flex items-center justify-center flex-col gap-2">
-        <TriangleAlert className="size-6 text-muted-foreground" />
-        <span className="text-sm text-muted-foreground">
-          Workspace not found!
-        </span>
-      </div>
-    );
-  }
-
-  return (
-    <div className="h-full flex-1 flex items-center justify-center flex-col gap-2">
-      <TriangleAlert className="size-6 text-muted-foreground" />
-      <span className="text-sm text-muted-foreground">Channel not found!</span>
-    </div>
-  );
+  return null;
 };
 
 export default WorkspacePage;
