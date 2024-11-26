@@ -40,7 +40,7 @@ const WorkspaceLayout = ({ children }: Props) => {
           {(!!parentMessageId || !!profileMemberId) && (
             <>
               <ResizableHandle />
-              <ResizablePanel defaultSize={24.15} minSize={20}>
+              <ResizablePanel defaultSize={24.15} minSize={24.15}>
                 {parentMessageId ? (
                   <Thread messageId={parentMessageId} onClose={onClose} />
                 ) : profileMemberId ? (
