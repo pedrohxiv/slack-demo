@@ -3,6 +3,7 @@ import { useParams } from "next/navigation";
 import { getMember } from "@/actions/members";
 import { getMessages } from "@/actions/messages";
 import { MessageList } from "@/components/message-list";
+import { usePanel } from "@/hooks/use-panel";
 
 import { ChatInput } from "./chat-input";
 import { Header } from "./header";
@@ -20,6 +21,7 @@ export const Conversation = ({ id }: Props) => {
   const { results, status, loadMore } = getMessages({
     conversationId: id,
   });
+  const { onOpenProfile } = usePanel();
 
   if (!memberData || memberIsLoading || status === "LoadingFirstPage") {
     return null;
@@ -30,7 +32,7 @@ export const Conversation = ({ id }: Props) => {
       <Header
         memberName={memberData.user.name}
         memberImage={memberData.user.image}
-        onClick={() => {}}
+        onClick={() => onOpenProfile(params.memberId)}
       />
       <MessageList
         memberName={memberData.user.name}
