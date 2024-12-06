@@ -12,15 +12,10 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Skeleton } from "@/components/ui/skeleton";
 
 export const UserButton = () => {
-  const { data, isLoading } = getCurrentUser();
+  const { data } = getCurrentUser();
   const { signOut } = useAuthActions();
-
-  if (isLoading) {
-    return <Skeleton className="size-10 rounded-md" />;
-  }
 
   if (!data || !data.name) {
     return null;

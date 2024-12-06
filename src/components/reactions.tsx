@@ -22,11 +22,11 @@ interface Props {
 export const Reactions = ({ data, onChange }: Props) => {
   const params = useParams<{ workspaceId: string; channelId: string }>();
 
-  const { data: memberData, isLoading: memberIsLoading } = getCurrentMember({
+  const { data: currentMember } = getCurrentMember({
     workspaceId: params.workspaceId,
   });
 
-  if (data.length === 0 || !memberData?._id) {
+  if (data.length === 0 || !currentMember) {
     return null;
   }
 
@@ -42,7 +42,7 @@ export const Reactions = ({ data, onChange }: Props) => {
               "h-6 px-2 rounded-full bg-slate-200/70 border border-transparent text-slate-800 flex items-center gap-x-1",
               {
                 "bg-blue-100/70 border-blue-500 text-white":
-                  reaction.memberIds.includes(memberData._id),
+                  reaction.memberIds.includes(currentMember._id),
               }
             )}
             onClick={() => onChange(reaction.value)}
@@ -50,7 +50,7 @@ export const Reactions = ({ data, onChange }: Props) => {
             {reaction.value}
             <span
               className={cn("text-xs font-semibold text-muted-foreground", {
-                "text-blue-500": reaction.memberIds.includes(memberData._id),
+                "text-blue-500": reaction.memberIds.includes(currentMember._id),
               })}
             >
               {reaction.count}
@@ -60,7 +60,7 @@ export const Reactions = ({ data, onChange }: Props) => {
       ))}
       <EmojiPopover
         hint="Add reaction"
-        onEmojiSelect={(emoji) => onChange(emoji.native)}
+        onEmojiSelect={(emoji) => onChange(emoji)}
       >
         <button className="h-7 px-3 rounded-full bg-slate-200/70 border border-transparent hover:border-slate-500 text-slate-800 flex items-center gap-x-1">
           <SmilePlus className="size-4" />

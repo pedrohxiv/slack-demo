@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
-import { useEffect, useMemo } from "react";
+import { useEffect } from "react";
 
 import { getWorkspaceInfo, join } from "@/actions/workspaces";
 import { Icons } from "@/components/icons";
@@ -18,17 +18,9 @@ const JoinPage = () => {
   const params = useParams<{ workspaceId: string }>();
   const router = useRouter();
 
-  const { data, isLoading } = getWorkspaceInfo({ id: params.workspaceId });
+  const { data } = getWorkspaceInfo({ id: params.workspaceId });
   const { mutate } = join();
   const { toast } = useToast();
-
-  const isMember = useMemo(() => data?.isMember, [data?.isMember]);
-
-  useEffect(() => {
-    if (isMember) {
-      router.replace(`/workspace/${params.workspaceId}`);
-    }
-  }, [isMember, router, params.workspaceId]);
 
   const handleComplete = (value: string) => {
     if (value.length === 6) {
@@ -52,7 +44,17 @@ const JoinPage = () => {
     }
   };
 
-  if (isLoading) {
+  useEffect(() => {
+    if (!data) {
+      return;
+    }
+
+    if (data.isMember) {
+      router.replace(`/workspace/${params.workspaceId}`);
+    }
+  }, [data, router, params.workspaceId]);
+
+  if (!data) {
     return;
   }
 

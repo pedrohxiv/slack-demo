@@ -1,63 +1,49 @@
 import { useMutation, useQuery } from "convex/react";
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useState } from "react";
 
 import { api } from "../../convex/_generated/api";
 import { Id } from "../../convex/_generated/dataModel";
 
-export const getCurrentMember = ({ workspaceId }: { workspaceId: string }) => {
-  const data = useQuery(api.members.current, { workspaceId });
-
-  const isLoading = data === undefined;
-
-  return { data, isLoading };
-};
-
-export const getMembers = ({ workspaceId }: { workspaceId: string }) => {
-  const data = useQuery(api.members.get, { workspaceId });
-
-  const isLoading = data === undefined;
-
-  return { data, isLoading };
-};
-
-export const getMember = ({ id }: { id: string }) => {
-  const data = useQuery(api.members.getById, { id });
-
-  const isLoading = data === undefined;
-
-  return { data, isLoading };
-};
-
 type Options = {
   onSuccess?: (data: Id<"members"> | null) => void;
   onError?: (error: Error) => void;
-  onSettled?: () => void;
-  throwError?: boolean;
 };
 
-export const updateMember = () => {
-  const [data, setData] = useState<Id<"members"> | null>(null);
-  const [error, setError] = useState<Error | null>(null);
-  const [status, setStatus] = useState<
-    "success" | "error" | "settled" | "pending" | null
-  >(null);
+type GetCurrentMemberProps = { workspaceId: string };
 
-  const isPending = useMemo(() => status === "pending", [status]);
-  const isSuccess = useMemo(() => status === "success", [status]);
-  const isError = useMemo(() => status === "error", [status]);
-  const isSettled = useMemo(() => status === "settled", [status]);
+export const getCurrentMember = ({ workspaceId }: GetCurrentMemberProps) => {
+  const data = useQuery(api.members.current, { workspaceId });
+
+  return { data };
+};
+
+type GetMembersProps = { workspaceId: string };
+
+export const getMembers = ({ workspaceId }: GetMembersProps) => {
+  const data = useQuery(api.members.get, { workspaceId });
+
+  return { data };
+};
+
+type GetMemberProps = { id: string };
+
+export const getMember = ({ id }: GetMemberProps) => {
+  const data = useQuery(api.members.getById, { id });
+
+  return { data };
+};
+
+type UpdateMemberValues = { id: string; role: "admin" | "member" };
+
+export const updateMember = () => {
+  const [isPending, setIsPending] = useState<boolean>(false);
 
   const mutation = useMutation(api.members.update);
 
   const mutate = useCallback(
-    async (
-      values: { id: string; role: "admin" | "member" },
-      options?: Options
-    ) => {
+    async (values: UpdateMemberValues, options?: Options) => {
       try {
-        setData(null);
-        setError(null);
-        setStatus("pending");
+        setIsPending(true);
 
         const response = await mutation(values);
 
@@ -65,45 +51,28 @@ export const updateMember = () => {
 
         return response;
       } catch (error) {
-        setStatus("error");
-
         options?.onError?.(error as Error);
-
-        if (options?.throwError) {
-          throw error;
-        }
       } finally {
-        setStatus("settled");
-
-        options?.onSettled?.();
+        setIsPending(false);
       }
     },
     [mutation]
   );
 
-  return { mutate, data, error, isPending, isSuccess, isError, isSettled };
+  return { mutate, isPending };
 };
 
-export const removeMember = () => {
-  const [data, setData] = useState<Id<"members"> | null>(null);
-  const [error, setError] = useState<Error | null>(null);
-  const [status, setStatus] = useState<
-    "success" | "error" | "settled" | "pending" | null
-  >(null);
+type RemoveMemberValues = { id: string };
 
-  const isPending = useMemo(() => status === "pending", [status]);
-  const isSuccess = useMemo(() => status === "success", [status]);
-  const isError = useMemo(() => status === "error", [status]);
-  const isSettled = useMemo(() => status === "settled", [status]);
+export const removeMember = () => {
+  const [isPending, setIsPending] = useState<boolean>(false);
 
   const mutation = useMutation(api.members.remove);
 
   const mutate = useCallback(
-    async (values: { id: string }, options?: Options) => {
+    async (values: RemoveMemberValues, options?: Options) => {
       try {
-        setData(null);
-        setError(null);
-        setStatus("pending");
+        setIsPending(true);
 
         const response = await mutation(values);
 
@@ -111,21 +80,13 @@ export const removeMember = () => {
 
         return response;
       } catch (error) {
-        setStatus("error");
-
         options?.onError?.(error as Error);
-
-        if (options?.throwError) {
-          throw error;
-        }
       } finally {
-        setStatus("settled");
-
-        options?.onSettled?.();
+        setIsPending(false);
       }
     },
     [mutation]
   );
 
-  return { mutate, data, error, isPending, isSuccess, isError, isSettled };
+  return { mutate, isPending };
 };

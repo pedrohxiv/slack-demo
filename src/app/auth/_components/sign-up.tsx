@@ -24,24 +24,24 @@ export const SignUp = ({ setType }: Props) => {
   const [email, setEmail] = useState<string>("");
   const [password, setPassword] = useState<string>("");
   const [error, setError] = useState<string>("");
-  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [isPending, setIsPending] = useState<boolean>(false);
 
   const { signIn } = useAuthActions();
 
   const handlePasswordSignUp = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
-    setIsLoading(true);
+    setIsPending(true);
 
     signIn("password", { name, email, password, flow: "signUp" })
       .catch(() => setError("Something went wrong."))
-      .finally(() => setIsLoading(false));
+      .finally(() => setIsPending(false));
   };
 
   const handleProviderSignUp = (value: "google") => {
-    setIsLoading(true);
+    setIsPending(true);
 
-    signIn(value).finally(() => setIsLoading(false));
+    signIn(value).finally(() => setIsPending(false));
   };
 
   return (
@@ -61,7 +61,7 @@ export const SignUp = ({ setType }: Props) => {
       <CardContent className="space-y-5 px-0 pb-0">
         <form className="space-y-2.5" onSubmit={handlePasswordSignUp}>
           <Input
-            disabled={isLoading}
+            disabled={isPending}
             onChange={(e) => setName(e.target.value)}
             placeholder="Name"
             required
@@ -69,7 +69,7 @@ export const SignUp = ({ setType }: Props) => {
             value={name}
           />
           <Input
-            disabled={isLoading}
+            disabled={isPending}
             onChange={(e) => setEmail(e.target.value)}
             placeholder="Email"
             required
@@ -77,7 +77,7 @@ export const SignUp = ({ setType }: Props) => {
             value={email}
           />
           <Input
-            disabled={isLoading}
+            disabled={isPending}
             onChange={(e) => setPassword(e.target.value)}
             placeholder="Password"
             required
@@ -86,7 +86,7 @@ export const SignUp = ({ setType }: Props) => {
           />
           <Button
             className="w-full"
-            disabled={isLoading}
+            disabled={isPending}
             size="lg"
             type="submit"
           >
@@ -97,7 +97,7 @@ export const SignUp = ({ setType }: Props) => {
         <div className="flex flex-col gap-y-2.5">
           <Button
             className="w-full relative"
-            disabled={isLoading}
+            disabled={isPending}
             onClick={() => handleProviderSignUp("google")}
             size="lg"
             variant="outline"
@@ -110,7 +110,7 @@ export const SignUp = ({ setType }: Props) => {
           Already have an account?
           <span
             className={cn("ml-1 text-sky-700 hover:underline cursor-pointer", {
-              "opacity-50 hover:no-underline cursor-default": isLoading,
+              "opacity-50 hover:no-underline cursor-default": isPending,
             })}
             onClick={() => setType("signIn")}
           >

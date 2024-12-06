@@ -15,28 +15,24 @@ interface Props {
 export const Conversation = ({ id }: Props) => {
   const params = useParams<{ workspaceId: string; memberId: string }>();
 
-  const { data: memberData, isLoading: memberIsLoading } = getMember({
-    id: params.memberId,
-  });
-  const { results, status, loadMore } = getMessages({
-    conversationId: id,
-  });
+  const { data: member } = getMember({ id: params.memberId });
+  const { results, status, loadMore } = getMessages({ conversationId: id });
   const { onOpenProfile } = usePanel();
 
-  if (!memberData || memberIsLoading || status === "LoadingFirstPage") {
+  if (!member || status === "LoadingFirstPage") {
     return null;
   }
 
   return (
     <div className="flex flex-col h-full">
       <Header
-        memberName={memberData.user.name}
-        memberImage={memberData.user.image}
+        memberName={member.user.name}
+        memberImage={member.user.image}
         onClick={() => onOpenProfile(params.memberId)}
       />
       <MessageList
-        memberName={memberData.user.name}
-        memberImage={memberData.user.image}
+        memberName={member.user.name}
+        memberImage={member.user.image}
         variant="conversation"
         data={results}
         loadMore={loadMore}
@@ -44,7 +40,7 @@ export const Conversation = ({ id }: Props) => {
         canLoadMore={status === "CanLoadMore"}
       />
       <ChatInput
-        placeholder={`Message ${memberData.user.name}`}
+        placeholder={`Message ${member.user.name}`}
         conversationId={id}
       />
     </div>

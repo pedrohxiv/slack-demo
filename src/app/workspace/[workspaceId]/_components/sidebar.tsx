@@ -21,14 +21,11 @@ export const Sidebar = () => {
   const pathname = usePathname();
   const router = useRouter();
 
-  const { data: workspaceData, isLoading: workspaceIsLoading } = getWorkspace({
-    id: params.workspaceId,
-  });
-  const { data: workspacesData, isLoading: workspacesIsLoading } =
-    getWorkspaces();
+  const { data: workspace } = getWorkspace({ id: params.workspaceId });
+  const { data: workspaces } = getWorkspaces();
 
-  if (workspaceIsLoading || workspacesIsLoading) {
-    return <div className="w-[70px] h-full bg-[#481349]" />;
+  if (!workspace || !workspaces) {
+    return <div className="w-[70px] bg-[#481349]" />;
   }
 
   return (
@@ -36,7 +33,7 @@ export const Sidebar = () => {
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
           <Button className="size-9 relative overflow-hidden bg-[#ABABAD] hover:bg-[#ABABAD]/80 text-slate-800 font-bold text-xl">
-            {workspaceData?.name.charAt(0).toUpperCase()}
+            {workspace.name.charAt(0).toUpperCase()}
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="start" className="w-64" side="bottom">
@@ -44,13 +41,13 @@ export const Sidebar = () => {
             className="cursor-pointer flex-col justify-start items-start"
             onClick={() => router.push(`/workspace/${params.workspaceId}`)}
           >
-            <p className="font-semibold">{workspaceData?.name}</p>
+            <p className="font-semibold">{workspace.name}</p>
             <span className="text-xs text-muted-foreground">
               Active Workspace
             </span>
           </DropdownMenuItem>
-          {workspacesData
-            ?.filter((workspace) => workspace._id !== params.workspaceId)
+          {workspaces
+            .filter((workspace) => workspace._id !== params.workspaceId)
             .map((workspace) => (
               <DropdownMenuItem
                 className="cursor-pointer capitalize overflow-hidden"

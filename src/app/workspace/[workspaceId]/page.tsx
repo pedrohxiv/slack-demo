@@ -1,7 +1,7 @@
 "use client";
 
 import { useParams, useRouter } from "next/navigation";
-import { useEffect, useMemo } from "react";
+import { useEffect } from "react";
 
 import { getChannels } from "@/actions/channels";
 import { getCurrentMember } from "@/actions/members";
@@ -11,46 +11,35 @@ import { useCreateChannel } from "@/store/create-channel";
 const WorkspacePage = () => {
   const [open, setOpen] = useCreateChannel();
 
-  const router = useRouter();
   const params = useParams<{ workspaceId: string }>();
+  const router = useRouter();
 
-  const { data: memberData, isLoading: memberIsLoading } = getCurrentMember({
+  const { data: currentMember } = getCurrentMember({
     workspaceId: params.workspaceId,
   });
-  const { data: workspaceData, isLoading: workspaceIsLoading } = getWorkspace({
+  const { data: workspace } = getWorkspace({
     id: params.workspaceId,
   });
-  const { data: channelsData, isLoading: channelsIsLoading } = getChannels({
+  const { data: channels } = getChannels({
     workspaceId: params.workspaceId,
   });
 
-  const channelId = useMemo(() => channelsData?.[0]._id, [channelsData]);
-  const isAdmin = useMemo(() => memberData?.role === "admin", [memberData]);
-
   useEffect(() => {
-    if (
-      workspaceIsLoading ||
-      channelsIsLoading ||
-      memberIsLoading ||
-      !memberData ||
-      !workspaceData
-    ) {
+    if (!currentMember || !workspace || !channels) {
       return;
     }
 
-    if (channelId) {
-      router.push(`/workspace/${params.workspaceId}/channel/${channelId}`);
-    } else if (!open && isAdmin) {
+    if (channels[0]) {
+      router.push(
+        `/workspace/${params.workspaceId}/channel/${channels[0]._id}`
+      );
+    } else if (!open && currentMember.role === "admin") {
       setOpen(true);
     }
   }, [
-    channelId,
-    isAdmin,
-    memberIsLoading,
-    workspaceIsLoading,
-    channelsIsLoading,
-    memberData,
-    workspaceData,
+    currentMember,
+    workspace,
+    channels,
     open,
     setOpen,
     router,

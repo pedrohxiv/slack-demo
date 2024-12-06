@@ -29,11 +29,10 @@ export const Profile = ({ memberId, onClose }: Props) => {
   const params = useParams<{ workspaceId: string }>();
   const router = useRouter();
 
-  const { data: currentMemberData, isLoading: currentMemberIsLoading } =
-    getCurrentMember({ workspaceId: params.workspaceId });
-  const { data: memberData, isLoading: memberIsLoading } = getMember({
-    id: memberId,
+  const { data: currentMember } = getCurrentMember({
+    workspaceId: params.workspaceId,
   });
+  const { data: member } = getMember({ id: memberId });
   const { mutate: updateMutate, isPending: updateIsPeding } = updateMember();
   const { mutate: removeMutate, isPending: removeIsPeding } = removeMember();
   const { toast } = useToast();
@@ -42,9 +41,6 @@ export const Profile = ({ memberId, onClose }: Props) => {
     updateMutate(
       { id: memberId, role },
       {
-        onSuccess: () => {
-          onClose();
-        },
         onError: (error) => {
           console.error(error);
 
@@ -100,12 +96,7 @@ export const Profile = ({ memberId, onClose }: Props) => {
     );
   };
 
-  if (
-    !currentMemberData ||
-    currentMemberIsLoading ||
-    !memberData ||
-    memberIsLoading
-  ) {
+  if (!currentMember || !member) {
     return null;
   }
 
@@ -113,27 +104,35 @@ export const Profile = ({ memberId, onClose }: Props) => {
     <div className="h-full flex flex-col">
       <div className="flex justify-between h-[49px] items-center px-4 border-b">
         <p className="text-lg font-bold">Profile</p>
-        <Button onClick={onClose} size="sm" variant="ghost">
+        <Button
+          disabled={updateIsPeding || removeIsPeding}
+          onClick={onClose}
+          size="sm"
+          variant="ghost"
+        >
           <X className="size-5 stroke-[1.5]" />
         </Button>
       </div>
       <div className="flex flex-col items-center justify-center p-4">
         <Avatar className="max-w-[256px] max-h-[256px] size-full">
-          <AvatarImage src={memberData.user.image} />
+          <AvatarImage src={member.user.image} />
           <AvatarFallback className="aspect-square text-6xl">
-            {memberData.user.name?.[0] || "M"}
+            {member.user.name?.[0] || "M"}
           </AvatarFallback>
         </Avatar>
       </div>
       <div className="flex flex-col p-4">
-        <p className="text-xl font-bold">{memberData.user.name}</p>
-        {currentMemberData.role === "admin" &&
-        currentMemberData._id === memberId ? (
+        <p className="text-xl font-bold">{member.user.name}</p>
+        {currentMember.role === "admin" && currentMember._id !== memberId ? (
           <div className="flex items-center gap-2 mt-4">
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button className="w-full capitalize" variant="outline">
-                  {memberData.role} <ChevronDown className="size-4 ml-2" />
+                <Button
+                  className="w-full capitalize"
+                  disabled={updateIsPeding || removeIsPeding}
+                  variant="outline"
+                >
+                  {member.role} <ChevronDown className="size-4 ml-2" />
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent className="w-full">
@@ -141,27 +140,39 @@ export const Profile = ({ memberId, onClose }: Props) => {
                   onValueChange={(role) =>
                     handleUpdate(role as "admin" | "member")
                   }
-                  value={memberData.role}
+                  value={member.role}
                 >
-                  <DropdownMenuRadioItem value="admin">
+                  <DropdownMenuRadioItem
+                    className="cursor-pointer"
+                    value="admin"
+                  >
                     Admin
                   </DropdownMenuRadioItem>
-                  <DropdownMenuRadioItem value="member">
+                  <DropdownMenuRadioItem
+                    className="cursor-pointer"
+                    value="member"
+                  >
                     Member
                   </DropdownMenuRadioItem>
                 </DropdownMenuRadioGroup>
               </DropdownMenuContent>
             </DropdownMenu>
-            <Button className="w-full" onClick={handleRemove} variant="outline">
+            <Button
+              className="w-full"
+              disabled={updateIsPeding || removeIsPeding}
+              onClick={handleRemove}
+              variant="outline"
+            >
               Remove
             </Button>
           </div>
         ) : (
-          currentMemberData._id === memberId &&
-          currentMemberData.role !== "admin" && (
+          currentMember._id === memberId &&
+          currentMember.role !== "admin" && (
             <div className="mt-4">
               <Button
                 className="w-full"
+                disabled={updateIsPeding || removeIsPeding}
                 onClick={handleLeave}
                 variant="outline"
               >
@@ -184,9 +195,9 @@ export const Profile = ({ memberId, onClose }: Props) => {
             </p>
             <Link
               className="text-sm hover:underline text-[#1264A3]"
-              href={`mailto:${memberData.user.email}`}
+              href={`mailto:${member.user.email}`}
             >
-              {memberData.user.email}
+              {member.user.email}
             </Link>
           </div>
         </div>

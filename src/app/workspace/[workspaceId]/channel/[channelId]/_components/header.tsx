@@ -87,8 +87,8 @@ export const Header = ({ title }: Props) => {
         </span>
       ) : (
         <Dialog>
-          <DialogTrigger asChild>
-            <Hint label="Get channel details" side="bottom">
+          <Hint label="Get channel details" side="bottom">
+            <DialogTrigger asChild>
               <Button
                 className="text-lg font-bold px-2 overflow-hidden w-auto"
                 size="sm"
@@ -96,8 +96,8 @@ export const Header = ({ title }: Props) => {
               >
                 <span className="truncate"># {title}</span>
               </Button>
-            </Hint>
-          </DialogTrigger>
+            </DialogTrigger>
+          </Hint>
           <DialogContent className="p-0 bg-gray-50 overflow-hidden">
             <DialogHeader className="p-4 border-b bg-white">
               <DialogTitle># {title}</DialogTitle>

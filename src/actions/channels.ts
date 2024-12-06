@@ -1,5 +1,5 @@
 import { useMutation, useQuery } from "convex/react";
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useState } from "react";
 
 import { api } from "../../convex/_generated/api";
 import { Id } from "../../convex/_generated/dataModel";
@@ -7,33 +7,19 @@ import { Id } from "../../convex/_generated/dataModel";
 type Options = {
   onSuccess?: (data: Id<"channels"> | null) => void;
   onError?: (error: Error) => void;
-  onSettled?: () => void;
-  throwError?: boolean;
 };
 
-export const createChannel = () => {
-  const [data, setData] = useState<Id<"channels"> | null>(null);
-  const [error, setError] = useState<Error | null>(null);
-  const [status, setStatus] = useState<
-    "success" | "error" | "settled" | "pending" | null
-  >(null);
+type CreateChannelValues = { name: string; workspaceId: string };
 
-  const isPending = useMemo(() => status === "pending", [status]);
-  const isSuccess = useMemo(() => status === "success", [status]);
-  const isError = useMemo(() => status === "error", [status]);
-  const isSettled = useMemo(() => status === "settled", [status]);
+export const createChannel = () => {
+  const [isPending, setIsPending] = useState<boolean>(false);
 
   const mutation = useMutation(api.channels.create);
 
   const mutate = useCallback(
-    async (
-      values: { name: string; workspaceId: string },
-      options?: Options
-    ) => {
+    async (values: CreateChannelValues, options?: Options) => {
       try {
-        setData(null);
-        setError(null);
-        setStatus("pending");
+        setIsPending(true);
 
         const response = await mutation(values);
 
@@ -41,64 +27,44 @@ export const createChannel = () => {
 
         return response;
       } catch (error) {
-        setStatus("error");
-
         options?.onError?.(error as Error);
-
-        if (options?.throwError) {
-          throw error;
-        }
       } finally {
-        setStatus("settled");
-
-        options?.onSettled?.();
+        setIsPending(false);
       }
     },
     [mutation]
   );
 
-  return { mutate, data, error, isPending, isSuccess, isError, isSettled };
+  return { mutate, isPending };
 };
 
-export const getChannels = ({ workspaceId }: { workspaceId: string }) => {
+type GetChannelsProps = { workspaceId: string };
+
+export const getChannels = ({ workspaceId }: GetChannelsProps) => {
   const data = useQuery(api.channels.get, { workspaceId });
 
-  const isLoading = data === undefined;
-
-  return { data, isLoading };
+  return { data };
 };
 
-export const getChannel = ({ id }: { id: string }) => {
+type GetChannelProps = { id: string };
+
+export const getChannel = ({ id }: GetChannelProps) => {
   const data = useQuery(api.channels.getById, { id });
 
-  const isLoading = data === undefined;
-
-  return { data, isLoading };
+  return { data };
 };
 
-export const updateChannel = () => {
-  const [data, setData] = useState<Id<"channels"> | null>(null);
-  const [error, setError] = useState<Error | null>(null);
-  const [status, setStatus] = useState<
-    "success" | "error" | "settled" | "pending" | null
-  >(null);
+type UpdateChannelValues = { id: string; workspaceId: string; name: string };
 
-  const isPending = useMemo(() => status === "pending", [status]);
-  const isSuccess = useMemo(() => status === "success", [status]);
-  const isError = useMemo(() => status === "error", [status]);
-  const isSettled = useMemo(() => status === "settled", [status]);
+export const updateChannel = () => {
+  const [isPending, setIsPending] = useState<boolean>(false);
 
   const mutation = useMutation(api.channels.update);
 
   const mutate = useCallback(
-    async (
-      values: { id: string; workspaceId: string; name: string },
-      options?: Options
-    ) => {
+    async (values: UpdateChannelValues, options?: Options) => {
       try {
-        setData(null);
-        setError(null);
-        setStatus("pending");
+        setIsPending(true);
 
         const response = await mutation(values);
 
@@ -106,45 +72,28 @@ export const updateChannel = () => {
 
         return response;
       } catch (error) {
-        setStatus("error");
-
         options?.onError?.(error as Error);
-
-        if (options?.throwError) {
-          throw error;
-        }
       } finally {
-        setStatus("settled");
-
-        options?.onSettled?.();
+        setIsPending(false);
       }
     },
     [mutation]
   );
 
-  return { mutate, data, error, isPending, isSuccess, isError, isSettled };
+  return { mutate, isPending };
 };
 
-export const removeChannel = () => {
-  const [data, setData] = useState<Id<"channels"> | null>(null);
-  const [error, setError] = useState<Error | null>(null);
-  const [status, setStatus] = useState<
-    "success" | "error" | "settled" | "pending" | null
-  >(null);
+type RemoveChannelValues = { id: string; workspaceId: string };
 
-  const isPending = useMemo(() => status === "pending", [status]);
-  const isSuccess = useMemo(() => status === "success", [status]);
-  const isError = useMemo(() => status === "error", [status]);
-  const isSettled = useMemo(() => status === "settled", [status]);
+export const removeChannel = () => {
+  const [isPending, setIsPending] = useState<boolean>(false);
 
   const mutation = useMutation(api.channels.remove);
 
   const mutate = useCallback(
-    async (values: { id: string; workspaceId: string }, options?: Options) => {
+    async (values: RemoveChannelValues, options?: Options) => {
       try {
-        setData(null);
-        setError(null);
-        setStatus("pending");
+        setIsPending(true);
 
         const response = await mutation(values);
 
@@ -152,21 +101,13 @@ export const removeChannel = () => {
 
         return response;
       } catch (error) {
-        setStatus("error");
-
         options?.onError?.(error as Error);
-
-        if (options?.throwError) {
-          throw error;
-        }
       } finally {
-        setStatus("settled");
-
-        options?.onSettled?.();
+        setIsPending(false);
       }
     },
     [mutation]
   );
 
-  return { mutate, data, error, isPending, isSuccess, isError, isSettled };
+  return { mutate, isPending };
 };

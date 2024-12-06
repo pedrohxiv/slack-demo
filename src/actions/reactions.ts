@@ -1,5 +1,5 @@
 import { useMutation } from "convex/react";
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useState } from "react";
 
 import { api } from "../../convex/_generated/api";
 import { Id } from "../../convex/_generated/dataModel";
@@ -7,30 +7,19 @@ import { Id } from "../../convex/_generated/dataModel";
 type Options = {
   onSuccess?: (data: Id<"reactions"> | null) => void;
   onError?: (error: Error) => void;
-  onSettled?: () => void;
-  throwError?: boolean;
 };
 
-export const toggleReaction = () => {
-  const [data, setData] = useState<Id<"reactions"> | null>(null);
-  const [error, setError] = useState<Error | null>(null);
-  const [status, setStatus] = useState<
-    "success" | "error" | "settled" | "pending" | null
-  >(null);
+type ToggleReactionValues = { messageId: string; value: string };
 
-  const isPending = useMemo(() => status === "pending", [status]);
-  const isSuccess = useMemo(() => status === "success", [status]);
-  const isError = useMemo(() => status === "error", [status]);
-  const isSettled = useMemo(() => status === "settled", [status]);
+export const toggleReaction = () => {
+  const [isPending, setIsPending] = useState<boolean>(false);
 
   const mutation = useMutation(api.reactions.toggle);
 
   const mutate = useCallback(
-    async (values: { messageId: string; value: string }, options?: Options) => {
+    async (values: ToggleReactionValues, options?: Options) => {
       try {
-        setData(null);
-        setError(null);
-        setStatus("pending");
+        setIsPending(true);
 
         const response = await mutation(values);
 
@@ -38,21 +27,13 @@ export const toggleReaction = () => {
 
         return response;
       } catch (error) {
-        setStatus("error");
-
         options?.onError?.(error as Error);
-
-        if (options?.throwError) {
-          throw error;
-        }
       } finally {
-        setStatus("settled");
-
-        options?.onSettled?.();
+        setIsPending(false);
       }
     },
     [mutation]
   );
 
-  return { mutate, data, error, isPending, isSuccess, isError, isSettled };
+  return { mutate, isPending };
 };

@@ -1,5 +1,4 @@
 import {
-  AlertTriangle,
   ChevronDown,
   Hash,
   MessageSquareText,
@@ -43,47 +42,33 @@ export const InternalSidebar = () => {
     memberId: string;
   }>();
 
-  const { data: memberData, isLoading: memberIsLoading } = getCurrentMember({
+  const { data: currentMember } = getCurrentMember({
     workspaceId: params.workspaceId,
   });
-  const { data: workspaceData, isLoading: workspaceIsLoading } = getWorkspace({
+  const { data: workspace } = getWorkspace({
     id: params.workspaceId,
   });
-  const { data: channelsData, isLoading: channelsIsLoading } = getChannels({
+  const { data: channels } = getChannels({
     workspaceId: params.workspaceId,
   });
-  const { data: membersData, isLoading: membersIsLoading } = getMembers({
+  const { data: members } = getMembers({
     workspaceId: params.workspaceId,
   });
 
-  if (
-    memberIsLoading ||
-    workspaceIsLoading ||
-    channelsIsLoading ||
-    membersIsLoading
-  ) {
+  if (!currentMember || !workspace || !channels || !members) {
     return null;
-  }
-
-  if (!memberData || !workspaceData || !channelsData || !membersData) {
-    return (
-      <div className="flex flex-col gap-y-2 bg-[#5E2C5F] h-full items-center justify-center">
-        <AlertTriangle className="size-5 text-white" />
-        <p className="text-white text-sm">Workspace not found!</p>
-      </div>
-    );
   }
 
   return (
     <div className="flex flex-col bg-[#5E2C5F] h-full">
       <Invite
-        name={workspaceData.name}
-        joinCode={workspaceData.joinCode}
+        name={workspace.name}
+        joinCode={workspace.joinCode}
         open={inviteOpen}
         setOpen={setInviteOpen}
       />
       <Preferences
-        initialValue={workspaceData.name}
+        initialValue={workspace.name}
         open={preferencesOpen}
         setOpen={setPreferencesOpen}
       />
@@ -95,30 +80,30 @@ export const InternalSidebar = () => {
               size="sm"
               variant="transparent"
             >
-              <span className="text-white font-bold">{workspaceData.name}</span>
+              <span className="text-white font-bold">{workspace.name}</span>
               <ChevronDown className="size-4 ml-1 shrink-0" />
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="start" className="w-64" side="bottom">
             <DropdownMenuItem className="cursor-pointer capitalize">
               <div className="size-9 relative overflow-hidden bg-[#616061] text-white font-semibold text-xl rounded-md flex items-center justify-center mr-2">
-                {workspaceData.name.charAt(0).toUpperCase()}
+                {workspace.name.charAt(0).toUpperCase()}
               </div>
               <div className="flex flex-col items-start">
-                <p className="font-bold">{workspaceData.name}</p>
+                <p className="font-bold">{workspace.name}</p>
                 <p className="text-xs text-muted-foreground">
                   Active Workspace
                 </p>
               </div>
             </DropdownMenuItem>
-            {memberData.role === "admin" && (
+            {currentMember.role === "admin" && (
               <>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem
                   className="cursor-pointer py-2"
                   onClick={() => setInviteOpen(true)}
                 >
-                  Invite people to {workspaceData.name}
+                  Invite people to {workspace.name}
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem
@@ -188,7 +173,7 @@ export const InternalSidebar = () => {
           >
             <span className="truncate">Channels</span>
           </Button>
-          {memberData.role === "admin" && (
+          {currentMember.role === "admin" && (
             <Hint label="New channel" side="top" align="center">
               <Button
                 onClick={() => setCreateChannelOpen(true)}
@@ -202,25 +187,27 @@ export const InternalSidebar = () => {
           )}
         </div>
         {channelsOpen &&
-          channelsData?.map((item) => (
+          channels.map((channel) => (
             <Button
-              key={item._id}
+              key={channel._id}
               asChild
               className={cn(
                 "flex items-center gap-1.5 justify-start font-normal h-7 px-[18px] text-sm overflow-hidden text-[#F9EDFFCC]",
                 {
                   "text-[#481349] bg-white/90 hover:bg-white/90":
-                    params.channelId === item._id,
+                    params.channelId === channel._id,
                 }
               )}
               size="sm"
               variant="transparent"
             >
               <Link
-                href={`/workspace/${params.workspaceId}/channel/${item._id}`}
+                href={`/workspace/${params.workspaceId}/channel/${channel._id}`}
               >
                 <Hash className="size-3.5 mr-1 shrink-0" />
-                <span className="text-sm truncate capitalize">{item.name}</span>
+                <span className="text-sm truncate capitalize">
+                  {channel.name}
+                </span>
               </Link>
             </Button>
           ))}
@@ -248,7 +235,7 @@ export const InternalSidebar = () => {
           >
             <span className="truncate">Direct Messages</span>
           </Button>
-          {memberData.role === "admin" && (
+          {currentMember.role === "admin" && (
             <Hint label="New direct message" side="top" align="center">
               <Button
                 onClick={() => {}}
@@ -262,30 +249,30 @@ export const InternalSidebar = () => {
           )}
         </div>
         {messagesOpen &&
-          membersData.map((item) => (
+          members.map((member) => (
             <Button
-              key={item._id}
+              key={member._id}
               asChild
               className={cn(
                 "flex items-center gap-1.5 justify-start font-normal h-7 px-4 text-sm overflow-hidden text-[#F9EDFFCC]",
                 {
                   "text-[#481349] bg-white/90 hover:bg-white/90":
-                    params.memberId === item._id,
+                    params.memberId === member._id,
                 }
               )}
               size="sm"
               variant="transparent"
             >
               <Link
-                href={`/workspace/${params.workspaceId}/member/${item._id}`}
+                href={`/workspace/${params.workspaceId}/member/${member._id}`}
               >
                 <Avatar className="size-5 mr-1">
-                  <AvatarImage src={item.user.image} />
+                  <AvatarImage src={member.user.image} />
                   <AvatarFallback>
-                    {item.user.name?.charAt(0).toUpperCase()}
+                    {member.user.name?.charAt(0).toUpperCase()}
                   </AvatarFallback>
                 </Avatar>
-                <span className="text-sm truncate">{item.user.name}</span>
+                <span className="text-sm truncate">{member.user.name}</span>
               </Link>
             </Button>
           ))}

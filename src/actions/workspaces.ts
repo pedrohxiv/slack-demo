@@ -1,5 +1,5 @@
 import { useMutation, useQuery } from "convex/react";
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useState } from "react";
 
 import { api } from "../../convex/_generated/api";
 import { Id } from "../../convex/_generated/dataModel";
@@ -7,30 +7,19 @@ import { Id } from "../../convex/_generated/dataModel";
 type Options = {
   onSuccess?: (data: Id<"workspaces"> | null) => void;
   onError?: (error: Error) => void;
-  onSettled?: () => void;
-  throwError?: boolean;
 };
 
-export const createWorkspace = () => {
-  const [data, setData] = useState<Id<"workspaces"> | null>(null);
-  const [error, setError] = useState<Error | null>(null);
-  const [status, setStatus] = useState<
-    "success" | "error" | "settled" | "pending" | null
-  >(null);
+type CreateWorkspaceValues = { name: string };
 
-  const isPending = useMemo(() => status === "pending", [status]);
-  const isSuccess = useMemo(() => status === "success", [status]);
-  const isError = useMemo(() => status === "error", [status]);
-  const isSettled = useMemo(() => status === "settled", [status]);
+export const createWorkspace = () => {
+  const [isPending, setIsPending] = useState<boolean>(false);
 
   const mutation = useMutation(api.workspaces.create);
 
   const mutate = useCallback(
-    async (values: { name: string }, options?: Options) => {
+    async (values: CreateWorkspaceValues, options?: Options) => {
       try {
-        setData(null);
-        setError(null);
-        setStatus("pending");
+        setIsPending(true);
 
         const response = await mutation(values);
 
@@ -38,61 +27,42 @@ export const createWorkspace = () => {
 
         return response;
       } catch (error) {
-        setStatus("error");
-
         options?.onError?.(error as Error);
-
-        if (options?.throwError) {
-          throw error;
-        }
       } finally {
-        setStatus("settled");
-
-        options?.onSettled?.();
+        setIsPending(false);
       }
     },
     [mutation]
   );
 
-  return { mutate, data, error, isPending, isSuccess, isError, isSettled };
+  return { mutate, isPending };
 };
 
 export const getWorkspaces = () => {
   const data = useQuery(api.workspaces.get);
 
-  const isLoading = data === undefined;
-
-  return { data, isLoading };
+  return { data };
 };
 
-export const getWorkspace = ({ id }: { id: string }) => {
+type GetWorkspaceProps = { id: string };
+
+export const getWorkspace = ({ id }: GetWorkspaceProps) => {
   const data = useQuery(api.workspaces.getById, { id });
 
-  const isLoading = data === undefined;
-
-  return { data, isLoading };
+  return { data };
 };
 
-export const updateWorkspace = () => {
-  const [data, setData] = useState<Id<"workspaces"> | null>(null);
-  const [error, setError] = useState<Error | null>(null);
-  const [status, setStatus] = useState<
-    "success" | "error" | "settled" | "pending" | null
-  >(null);
+type UpdateWorkspaceValues = { id: string; name: string };
 
-  const isPending = useMemo(() => status === "pending", [status]);
-  const isSuccess = useMemo(() => status === "success", [status]);
-  const isError = useMemo(() => status === "error", [status]);
-  const isSettled = useMemo(() => status === "settled", [status]);
+export const updateWorkspace = () => {
+  const [isPending, setIsPending] = useState<boolean>(false);
 
   const mutation = useMutation(api.workspaces.update);
 
   const mutate = useCallback(
-    async (values: { id: string; name: string }, options?: Options) => {
+    async (values: UpdateWorkspaceValues, options?: Options) => {
       try {
-        setData(null);
-        setError(null);
-        setStatus("pending");
+        setIsPending(true);
 
         const response = await mutation(values);
 
@@ -100,45 +70,28 @@ export const updateWorkspace = () => {
 
         return response;
       } catch (error) {
-        setStatus("error");
-
         options?.onError?.(error as Error);
-
-        if (options?.throwError) {
-          throw error;
-        }
       } finally {
-        setStatus("settled");
-
-        options?.onSettled?.();
+        setIsPending(false);
       }
     },
     [mutation]
   );
 
-  return { mutate, data, error, isPending, isSuccess, isError, isSettled };
+  return { mutate, isPending };
 };
 
-export const removeWorkspace = () => {
-  const [data, setData] = useState<Id<"workspaces"> | null>(null);
-  const [error, setError] = useState<Error | null>(null);
-  const [status, setStatus] = useState<
-    "success" | "error" | "settled" | "pending" | null
-  >(null);
+type RemoveWorkspaceValues = { id: string };
 
-  const isPending = useMemo(() => status === "pending", [status]);
-  const isSuccess = useMemo(() => status === "success", [status]);
-  const isError = useMemo(() => status === "error", [status]);
-  const isSettled = useMemo(() => status === "settled", [status]);
+export const removeWorkspace = () => {
+  const [isPending, setIsPending] = useState<boolean>(false);
 
   const mutation = useMutation(api.workspaces.remove);
 
   const mutate = useCallback(
-    async (values: { id: string }, options?: Options) => {
+    async (values: RemoveWorkspaceValues, options?: Options) => {
       try {
-        setData(null);
-        setError(null);
-        setStatus("pending");
+        setIsPending(true);
 
         const response = await mutation(values);
 
@@ -146,45 +99,28 @@ export const removeWorkspace = () => {
 
         return response;
       } catch (error) {
-        setStatus("error");
-
         options?.onError?.(error as Error);
-
-        if (options?.throwError) {
-          throw error;
-        }
       } finally {
-        setStatus("settled");
-
-        options?.onSettled?.();
+        setIsPending(false);
       }
     },
     [mutation]
   );
 
-  return { mutate, data, error, isPending, isSuccess, isError, isSettled };
+  return { mutate, isPending };
 };
 
-export const newJoinCode = () => {
-  const [data, setData] = useState<Id<"workspaces"> | null>(null);
-  const [error, setError] = useState<Error | null>(null);
-  const [status, setStatus] = useState<
-    "success" | "error" | "settled" | "pending" | null
-  >(null);
+type NewJoinCodeValues = { workspaceId: string };
 
-  const isPending = useMemo(() => status === "pending", [status]);
-  const isSuccess = useMemo(() => status === "success", [status]);
-  const isError = useMemo(() => status === "error", [status]);
-  const isSettled = useMemo(() => status === "settled", [status]);
+export const newJoinCode = () => {
+  const [isPending, setIsPending] = useState<boolean>(false);
 
   const mutation = useMutation(api.workspaces.newJoinCode);
 
   const mutate = useCallback(
-    async (values: { workspaceId: string }, options?: Options) => {
+    async (values: NewJoinCodeValues, options?: Options) => {
       try {
-        setData(null);
-        setError(null);
-        setStatus("pending");
+        setIsPending(true);
 
         const response = await mutation(values);
 
@@ -192,48 +128,28 @@ export const newJoinCode = () => {
 
         return response;
       } catch (error) {
-        setStatus("error");
-
         options?.onError?.(error as Error);
-
-        if (options?.throwError) {
-          throw error;
-        }
       } finally {
-        setStatus("settled");
-
-        options?.onSettled?.();
+        setIsPending(false);
       }
     },
     [mutation]
   );
 
-  return { mutate, data, error, isPending, isSuccess, isError, isSettled };
+  return { mutate, isPending };
 };
 
-export const join = () => {
-  const [data, setData] = useState<Id<"workspaces"> | null>(null);
-  const [error, setError] = useState<Error | null>(null);
-  const [status, setStatus] = useState<
-    "success" | "error" | "settled" | "pending" | null
-  >(null);
+type JoinValues = { workspaceId: string; joinCode: string };
 
-  const isPending = useMemo(() => status === "pending", [status]);
-  const isSuccess = useMemo(() => status === "success", [status]);
-  const isError = useMemo(() => status === "error", [status]);
-  const isSettled = useMemo(() => status === "settled", [status]);
+export const join = () => {
+  const [isPending, setIsPending] = useState<boolean>(false);
 
   const mutation = useMutation(api.workspaces.join);
 
   const mutate = useCallback(
-    async (
-      values: { workspaceId: string; joinCode: string },
-      options?: Options
-    ) => {
+    async (values: JoinValues, options?: Options) => {
       try {
-        setData(null);
-        setError(null);
-        setStatus("pending");
+        setIsPending(true);
 
         const response = await mutation(values);
 
@@ -241,29 +157,21 @@ export const join = () => {
 
         return response;
       } catch (error) {
-        setStatus("error");
-
         options?.onError?.(error as Error);
-
-        if (options?.throwError) {
-          throw error;
-        }
       } finally {
-        setStatus("settled");
-
-        options?.onSettled?.();
+        setIsPending(false);
       }
     },
     [mutation]
   );
 
-  return { mutate, data, error, isPending, isSuccess, isError, isSettled };
+  return { mutate, isPending };
 };
 
-export const getWorkspaceInfo = ({ id }: { id: string }) => {
+type GetWorkspaceInfoProps = { id: string };
+
+export const getWorkspaceInfo = ({ id }: GetWorkspaceInfoProps) => {
   const data = useQuery(api.workspaces.getInfoById, { id });
 
-  const isLoading = data === undefined;
-
-  return { data, isLoading };
+  return { data };
 };

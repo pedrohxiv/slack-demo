@@ -26,12 +26,10 @@ export const Thread = ({ messageId, onClose }: Props) => {
   const params = useParams<{ workspaceId: string; channelId: string }>();
   const editorRef = useRef<Quill | null>(null);
 
-  const { data: memberData, isLoading: memberIsLoading } = getCurrentMember({
+  const { data: currentMember } = getCurrentMember({
     workspaceId: params.workspaceId,
   });
-  const { data: messageData, isLoading: messageIsLoading } = getMessage({
-    id: messageId,
-  });
+  const { data: message } = getMessage({ id: messageId });
   const { results, status, loadMore } = getMessages({
     channelId: params.channelId,
     parentMessageId: messageId,
@@ -123,13 +121,7 @@ export const Thread = ({ messageId, onClose }: Props) => {
     }
   };
 
-  if (
-    !memberData ||
-    memberIsLoading ||
-    !messageData ||
-    messageIsLoading ||
-    status === "LoadingFirstPage"
-  ) {
+  if (!currentMember || !message || status === "LoadingFirstPage") {
     return null;
   }
 
@@ -168,7 +160,7 @@ export const Thread = ({ messageId, onClose }: Props) => {
                   memberId={message.memberId}
                   authorImage={message.user.image}
                   authorName={message.user.name}
-                  isAuthor={message.memberId === memberData?._id}
+                  isAuthor={message.memberId === currentMember._id}
                   reactions={message.reactions}
                   body={message.body}
                   image={message.image}
@@ -214,17 +206,17 @@ export const Thread = ({ messageId, onClose }: Props) => {
           </div>
         )}
         <Message
-          id={messageData._id}
-          memberId={messageData.memberId}
-          authorImage={messageData.user.image}
-          authorName={messageData.user.name}
-          isAuthor={messageData.memberId === memberData._id}
-          reactions={messageData.reactions}
-          body={messageData.body}
-          image={messageData.image}
-          updatedAt={messageData.updatedAt}
-          createdAt={messageData._creationTime}
-          isEditing={editingId === messageData._id}
+          id={message._id}
+          memberId={message.memberId}
+          authorImage={message.user.image}
+          authorName={message.user.name}
+          isAuthor={message.memberId === currentMember._id}
+          reactions={message.reactions}
+          body={message.body}
+          image={message.image}
+          updatedAt={message.updatedAt}
+          createdAt={message._creationTime}
+          isEditing={editingId === message._id}
           setEditingId={setEditingId}
           hideThreadButton
         />
